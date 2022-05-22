@@ -1,5 +1,5 @@
 import { BadRequest, NotFound, Ok } from './ResponseType';
-export class ZuAppResponse {
+export class ZapiResponse {
   static Ok<Type>(
     data: Type,
     message = '',
