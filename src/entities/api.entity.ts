@@ -3,18 +3,16 @@ import {
   Column,
   Entity,
   JoinColumn,
-  JoinTable,
-  ManyToMany,
   ManyToOne,
   OneToMany,
   OneToOne,
 } from 'typeorm';
 import { Endpoint } from './endpoint.entity';
-import { Category } from './category.entity';
 import { Discussion } from './discussion.entity';
 import { Tutorial } from './tutorial.entity';
 import { IsArray } from 'class-validator';
 import { PriceGroup } from './priceGroup.entity';
+import { Profile } from './profile.entity';
 
 @Entity()
 export class Api extends SharedEntity {
@@ -40,9 +38,6 @@ export class Api extends SharedEntity {
   @Column({ default: false })
   verified: string;
 
-  @Column()
-  user_id: string;
-
   @Column({ nullable: true, default: 0 })
   rating: number;
 
@@ -52,14 +47,14 @@ export class Api extends SharedEntity {
   @ManyToOne(() => Tutorial, (tutorial) => tutorial.api)
   tutorials?: Tutorial[];
 
-  @ManyToMany(() => Category, (category) => category.api)
-  @JoinTable()
-  categories?: Category[];
-
   @OneToMany(() => Endpoint, (endpoint) => endpoint.api)
   endpoints: Endpoint[];
 
   @OneToOne(() => PriceGroup)
   @JoinColumn()
   pricegroup: PriceGroup[];
+
+  @OneToOne(() => Profile)
+  @JoinColumn()
+  profile: Profile;
 }
