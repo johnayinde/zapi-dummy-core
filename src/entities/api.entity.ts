@@ -15,6 +15,7 @@ import { Discussion } from './discussion.entity';
 import { Tutorial } from './tutorial.entity';
 import { IsArray } from 'class-validator';
 import { PriceGroup } from './priceGroup.entity';
+import { ApiPricing } from './api-pricing.entity';
 
 @Entity()
 export class Api extends SharedEntity {
@@ -58,6 +59,9 @@ export class Api extends SharedEntity {
 
   @OneToMany(() => Endpoint, (endpoint) => endpoint.api)
   endpoints: Endpoint[];
+
+  @OneToMany(type => ApiPricing, apiPricing => apiPricing.api) 
+  apiPricing: ApiPricing[]
 
   @OneToOne(() => PriceGroup)
   @JoinColumn()
