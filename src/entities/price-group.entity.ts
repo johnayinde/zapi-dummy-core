@@ -4,8 +4,8 @@ import { Api } from './api.entity';
 import { Pricing } from './pricing.entity';
 
 @Entity()
-export class ApiPricing extends SharedEntity {
-  @ManyToOne(() => Api, (api) => api.apiPricing, { nullable: true })
+export class PriceGroup extends SharedEntity {
+  @ManyToOne(() => Api, (api) => api.priceGroup, { nullable: true })
   @JoinColumn()
   api: Api;
 
