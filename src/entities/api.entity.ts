@@ -26,6 +26,9 @@ export class Api extends SharedEntity {
   type: string;
 
   @Column()
+  base_url: string;
+
+  @Column()
   category_id: string;
 
   @IsArray()
