@@ -5,6 +5,9 @@ import { Api } from './api.entity';
 @Entity()
 export class Tutorial extends SharedEntity {
   @Column()
+  title: string;
+
+  @Column()
   body: string;
 
   @OneToOne(() => Api, (api) => api.tutorials, { onDelete: 'CASCADE' })

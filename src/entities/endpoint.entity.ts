@@ -7,6 +7,12 @@ export class Endpoint extends SharedEntity {
   @Column()
   title: string;
 
+  @Column()
+  http_method: string;
+
+  @Column()
+  route: string;
+
   @Column({ nullable: true })
   description?: string;
 

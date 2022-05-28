@@ -25,6 +25,12 @@ export class Api extends SharedEntity {
   @Column()
   type: string;
 
+  @Column()
+  base_url: string;
+
+  @Column()
+  category_id: string;
+
   @IsArray()
   @Column({ nullable: true })
   subscribers: string;
@@ -50,8 +56,8 @@ export class Api extends SharedEntity {
   @OneToMany(() => Endpoint, (endpoint) => endpoint.api)
   endpoints: Endpoint[];
 
-  @OneToMany(type => PriceGroup, priceGroup => priceGroup.api) 
-  priceGroup: PriceGroup[]
+  @OneToMany(() => PriceGroup, (priceGroup) => priceGroup.api)
+  priceGroup: PriceGroup[];
 
   @OneToOne(() => Profile)
   @JoinColumn()
