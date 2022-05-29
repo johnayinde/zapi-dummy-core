@@ -9,6 +9,10 @@ export class Profile extends SharedEntity {
   @Column()
   email: string;
 
+  @Column()
+  picture: string;
+
   @Column({ nullable: true })
   organization?: string;
+
 }
