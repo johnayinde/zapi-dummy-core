@@ -4,9 +4,7 @@ import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Organisation extends SharedEntity {
-  @PrimaryGeneratedColumn('uuid')
-  organisation_id: string;
-
+ 
   @Column({ length: 200, unique: true })
   organisation_name: string;
 
@@ -16,14 +14,13 @@ export class Organisation extends SharedEntity {
   @Column({ nullable: true })
   number_of_employees: string;
 
-  @Column('uuid', { unique: true })
-  @OneToOne(() => Profile, (profile) => profile.email)
-  user_email: string; // Profile email that created the organisaion
+  @OneToOne(() => Profile, (profile) => profile.id)
+  profile_id: string; // Profile id that created the organisaion
 
   @Column({ nullable: true, unique: true })
   mail_extension: string; // mail extension that is unique to the organisation
 
   @Column('money', { default: '0' })
-  // 2 dollar per additional employee after the minimum employee required (4)
+  // Organisation monthly bills based on its number of seats
   price_per_month: string;
 }

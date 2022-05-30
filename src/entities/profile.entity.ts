@@ -11,8 +11,4 @@ export class Profile extends SharedEntity {
 
   @Column()
   picture: string;
-
-  @Column({ nullable: true })
-  organization?: string;
-
 }
