@@ -7,8 +7,8 @@ export class Organisation extends SharedEntity {
   @Column({ length: 200, unique: true })
   organisation: string;
 
-  @Column({ default: '4' })
-  number_of_seats: string;
+  @Column({ default: 4 })
+  number_of_seats: number;
 
   @Column({ nullable: true })
   number_of_employees: string;
