@@ -17,5 +17,5 @@ export class ProfileOrg extends SharedEntity {
     enum: OrgRole,
     default: OrgRole.DEVELOPER,
   })
-  format: OrgRole;
+  role: OrgRole;
 }
