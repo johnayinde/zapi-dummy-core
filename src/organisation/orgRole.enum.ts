@@ -1,6 +1,4 @@
-enum orgRole {
-  Admin = 'Admin',
-  Developer = 'Developer',
+export enum OrgRole {
+  Admin = 'admin',
+  Developer = 'developer',
 }
-
-export { orgRole };
