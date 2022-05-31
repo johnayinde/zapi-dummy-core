@@ -5,7 +5,7 @@ import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
 @Entity()
 export class Organisation extends SharedEntity {
   @Column({ length: 200, unique: true })
-  organisation: string;
+  name: string;
 
   @Column({ default: 4 })
   number_of_seats: number;

@@ -7,15 +7,15 @@ import { Column, Entity, ManyToOne } from 'typeorm';
 @Entity()
 export class ProfileOrg extends SharedEntity {
   @ManyToOne(() => Organisation, (organisation) => organisation.id)
-  organisation: string;
+  organisation: Organisation;
 
   @ManyToOne(() => Profile, (profile) => profile.id)
-  profile: string;
+  profile: Profile;
 
   @Column({
     type: 'enum',
     enum: OrgRole,
-    default: OrgRole.Developer,
+    default: OrgRole.DEVELOPER,
   })
   format: OrgRole;
 }

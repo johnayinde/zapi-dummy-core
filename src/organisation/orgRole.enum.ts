@@ -1,4 +1,4 @@
 export enum OrgRole {
-  Admin = 'admin',
-  Developer = 'developer',
+  ADMIN = 'admin',
+  DEVELOPER = 'developer',
 }
