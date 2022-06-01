@@ -13,6 +13,7 @@ import { Tutorial } from './tutorial.entity';
 import { IsArray } from 'class-validator';
 import { PriceGroup } from './price-group.entity';
 import { Profile } from './profile.entity';
+import { Category } from './category.entity';
 
 @Entity()
 export class Api extends SharedEntity {
@@ -27,9 +28,6 @@ export class Api extends SharedEntity {
 
   @Column()
   base_url: string;
-
-  @Column()
-  category_id: string;
 
   @IsArray()
   @Column({ nullable: true })
@@ -59,6 +57,8 @@ export class Api extends SharedEntity {
   @OneToMany(() => PriceGroup, (priceGroup) => priceGroup.api)
   priceGroup: PriceGroup[];
 
+  @ManyToOne(() => Category, (category) => category.api)
+  category: Category;
   @OneToOne(() => Profile)
   @JoinColumn()
   profile: Profile;

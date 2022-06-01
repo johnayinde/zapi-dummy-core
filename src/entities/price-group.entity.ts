@@ -1,4 +1,4 @@
-import { SharedEntity } from 'src/common/model/sharedEntity';
+import { SharedEntity } from '../common/model/sharedEntity';
 import { Entity, ManyToOne, OneToOne, JoinColumn } from 'typeorm';
 import { Api } from './api.entity';
 import { Pricing } from './pricing.entity';
