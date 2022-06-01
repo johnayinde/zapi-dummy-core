@@ -1,7 +1,7 @@
-import { SharedEntity } from 'src/common/model/sharedEntity';
+import { SharedEntity } from '../common/model/sharedEntity';
 import { Profile } from './profile.entity';
 import { Organisation } from './organisation.entity';
-import { OrgRole } from 'src/organisation/orgRole.enum';
+import { OrgRole } from '../organisation/orgRole.enum';
 import { Column, Entity, ManyToOne } from 'typeorm';
 
 @Entity()
