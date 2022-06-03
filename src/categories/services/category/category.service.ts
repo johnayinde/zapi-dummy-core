@@ -16,11 +16,11 @@ export class CategoryService {
   ) {}
 
   createCategory(payload: CreateCategoriesDto): FindCategoriesDto {
-    const newApi = {
+    const newCategory = {
       id: uuid(),
       ...payload,
     };
-    this.categoryRepository.save(newApi);
-    return newApi;
+    this.categoryRepository.save(newCategory);
+    return newCategory;
   }
 }
