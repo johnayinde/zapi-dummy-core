@@ -23,7 +23,7 @@ export class Api extends SharedEntity {
   @Column()
   description: string;
 
-  @Column()
+  @Column({ default: 'private' })
   type: string;
 
   @Column()
@@ -31,19 +31,19 @@ export class Api extends SharedEntity {
 
   @IsArray()
   @Column({ nullable: true })
-  subscribers: string;
+  subscribers?: string;
 
   @Column({ nullable: true, default: 0 })
-  popularity: number;
+  popularity?: number;
 
   @Column({ nullable: true })
   about: string;
 
   @Column({ default: false })
-  verified: string;
+  verified?: string;
 
   @Column({ nullable: true, default: 0 })
-  rating: number;
+  rating?: number;
 
   @OneToMany(() => Discussion, (discussion) => discussion.api)
   discussions?: Discussion[];
@@ -52,14 +52,14 @@ export class Api extends SharedEntity {
   tutorials?: Tutorial[];
 
   @OneToMany(() => Endpoint, (endpoint) => endpoint.api)
-  endpoints: Endpoint[];
+  endpoints?: Endpoint[];
 
   @OneToMany(() => PriceGroup, (priceGroup) => priceGroup.api)
-  priceGroup: PriceGroup[];
+  priceGroup?: PriceGroup[];
 
   @ManyToOne(() => Category, (category) => category.api)
   category: Category;
   @OneToOne(() => Profile)
   @JoinColumn()
-  profile: Profile;
+  profile?: Profile;
 }
