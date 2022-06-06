@@ -8,7 +8,6 @@ import { APIRepository } from 'src/database/repository/api.repository';
 import { CategoryRepository } from 'src/database/repository/category.repository';
 import { Api } from 'src/entities/api.entity';
 import { CreateApiDto } from './dto/create-api.dto';
-import { UpdateApiDto } from './dto/update-api.dto';
 
 /* The ApiService class is a service that uses the APiRepository class to do crud operation */
 @Injectable()
@@ -19,7 +18,11 @@ export class ApiService {
   ) {}
 
   /* Checking if the api name already exists in the database. */
-  async create(id: string, createApiDto: CreateApiDto): Promise<Api> {
+  async create(
+    profileId: string,
+    categoryId: string,
+    createApiDto: CreateApiDto,
+  ): Promise<Api> {
     try {
       const api = await this.apiRepository.findOne({
         where: { name: createApiDto.name },
@@ -33,26 +36,14 @@ export class ApiService {
           ),
         );
       }
-      const category = await this.categoryRepository.findOne({
-        where: { name: createApiDto.category },
-      });
-      if (!category) {
-        throw new BadRequestException(
-          ZapiResponse.NotFoundRequest(
-            'Not Found',
-            "Category doesn't exist ",
-            '404',
-          ),
-        );
-      } else {
-        const newApi = this.apiRepository.create({
-          ...createApiDto,
-          categoryId: category.id,
-          profileId: id,
-        });
 
-        return await this.apiRepository.save(newApi);
-      }
+      const newApi = this.apiRepository.create({
+        ...createApiDto,
+        categoryId: categoryId,
+        profileId,
+      });
+
+      return await this.apiRepository.save(newApi);
     } catch (error) {
       throw new BadRequestException(
         ZapiResponse.BadRequest('Server error', error, '500'),
@@ -145,60 +136,6 @@ export class ApiService {
         );
       }
       return api;
-    } catch (error) {
-      throw new BadRequestException(
-        ZapiResponse.BadRequest('Server error', error, '500'),
-      );
-    }
-  }
-
-  /**
-   * It updates the api with the id passed in the url and returns the updated api
-   * @param {string} id - The id of the api to be updated
-   * @param {UpdateApiDto} updateApiDto - UpdateApiDto
-   * @returns The updated api
-   */
-  async update(
-    id: string,
-    user_id: string,
-    updateApiDto: UpdateApiDto,
-  ): Promise<Api> {
-    try {
-      /* Checking if the user is the owner of the api. */
-      const verified = await this.verify(id, user_id);
-      if (verified === false) {
-        throw new NotFoundException(
-          ZapiResponse.BadRequest('Forbidden', 'Unauthorized action', '403'),
-        );
-      }
-      if (updateApiDto.category) {
-        const category = await this.categoryRepository.findOne({
-          where: { name: updateApiDto.category },
-        });
-        if (!category) {
-          throw new NotFoundException(
-            ZapiResponse.NotFoundRequest(
-              'Not Found',
-              'Selected category does not exist',
-              '404',
-            ),
-          );
-        } else {
-          await this.apiRepository.update(id, {
-            ...updateApiDto,
-            categoryId: category.id,
-          });
-        }
-      } else {
-        await this.apiRepository.update(id, updateApiDto);
-      }
-      const updatedAPI = await this.apiRepository.findOne(id);
-      if (updatedAPI) {
-        return updatedAPI;
-      }
-      throw new NotFoundException(
-        ZapiResponse.NotFoundRequest('Not Found', 'Api does not exist'),
-      );
     } catch (error) {
       throw new BadRequestException(
         ZapiResponse.BadRequest('Server error', error, '500'),
