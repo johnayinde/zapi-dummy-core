@@ -101,16 +101,14 @@ export class ApiService {
           break;
 
         case 'category':
-          console.log('cat ran');
-
           const category = await this.categoryRepository.findOne({
             where: { name: value },
           });
-          console.log(category.id);
 
           api = await this.apiRepository.find({
             where: { categoryId: category.id },
           });
+          break;
       }
       if (!api) {
         throw new NotFoundException(
