@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { configConstant } from './common/constants/config.constant';
+import { ApiModule } from './api/api.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { configConstant } from './common/constants/config.constant';
       }),
       inject: [ConfigService],
     }),
+    ApiModule,
   ],
   controllers: [AppController],
   providers: [AppService],
