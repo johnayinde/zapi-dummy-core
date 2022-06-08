@@ -1,9 +1,9 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CustomFindDto {
-  @ApiPropertyOptional()
+  @ApiProperty()
   name: string;
 
-  @ApiPropertyOptional()
+  @ApiProperty()
   value: string;
 }

@@ -5,17 +5,13 @@ import {
 } from '@nestjs/common';
 import { ZapiResponse } from 'src/common/helpers/response';
 import { APIRepository } from 'src/database/repository/api.repository';
-import { CategoryRepository } from 'src/database/repository/category.repository';
 import { Api } from 'src/entities/api.entity';
 import { CreateApiDto } from './dto/create-api.dto';
 
 /* The ApiService class is a service that uses the APiRepository class to do crud operation */
 @Injectable()
 export class ApiService {
-  constructor(
-    private readonly apiRepository: APIRepository,
-    private readonly categoryRepository: CategoryRepository,
-  ) {}
+  constructor(private readonly apiRepository: APIRepository) {}
 
   /* Checking if the api name already exists in the database. */
   async create(
@@ -39,7 +35,7 @@ export class ApiService {
 
       const newApi = this.apiRepository.create({
         ...createApiDto,
-        categoryId: categoryId,
+        categoryId,
         profileId,
       });
 
@@ -66,51 +62,16 @@ export class ApiService {
   }
 
   /**
-   * It takes in a name and value and returns an array of Api objects
-   * @param {any}  - name - the name of the query
-   * @returns An array of Api objects
+   * It takes in an object with a name and value property, and then uses the name property to find the
+   * value property in the database.
+   * @param {any}  - name - the name of the field you want to search for
+   * @returns An array of Api objects.
    */
-
   async customFind({ name, value }: any): Promise<Api[]> {
     try {
-      let api: any;
-      switch (name) {
-        case 'verified':
-          api = await this.apiRepository.find({
-            where: { verified: value },
-          });
-          break;
-
-        case 'profileId':
-          api = await this.apiRepository.find({
-            where: { profileId: value },
-          });
-          break;
-
-        case 'type':
-          api = await this.apiRepository.find({ where: { type: value } });
-          break;
-
-        case 'category':
-          const category = await this.categoryRepository.findOne({
-            where: { name: value },
-          });
-
-          api = await this.apiRepository.find({
-            where: { categoryId: category.id },
-          });
-          break;
-      }
-      if (!api) {
-        throw new NotFoundException(
-          ZapiResponse.NotFoundRequest(
-            'Not Found',
-            "Can't find any api with queries",
-            '404',
-          ),
-        );
-      }
-      return api;
+      return await this.apiRepository.find({
+        where: { [`${name}`]: value },
+      });
     } catch (error) {
       throw new BadRequestException(
         ZapiResponse.BadRequest('Server error', error, '500'),
@@ -146,13 +107,13 @@ export class ApiService {
   /**
    * It finds an api by id, if it exists, it removes it, if it doesn't exist, it throws a
    * NotFoundException
-   * @param {number} id - number - The id of the api to be deleted
+   * @param {string} id - number - The id of the api to be deleted
    * @returns The api object that was removed.
    */
-  async remove(id: string, user_id: string): Promise<Api> {
+  async remove(id: string, profileId: string): Promise<Api> {
     try {
       /* Checking if the user is the owner of the api. */
-      const verified = await this.verify(id, user_id);
+      const verified = await this.verify(id, profileId);
       if (verified === false) {
         throw new NotFoundException(
           ZapiResponse.BadRequest('Forbidden', 'Unauthorized action', '403'),
@@ -173,13 +134,13 @@ export class ApiService {
   }
 
   /**
-   * It checks if the api_id and user_id are the same.
+   * It checks if the profileId of the api is the same as the profileId of the user.
    * </code>
    * @param {string} api_id - The id of the api
-   * @param {string} user_id - The user id of the user who is trying to access the API
-   * @returns The status of the api.
+   * @param {string} profileId - The profileId is the id of the profile that is being verified.
+   * @returns A boolean value
    */
-  async verify(api_id: string, user_id: string): Promise<boolean> {
+  async verify(api_id: string, profileId: string): Promise<boolean> {
     try {
       const api = await this.apiRepository.findOne({
         id: api_id,
@@ -193,7 +154,7 @@ export class ApiService {
           ),
         );
       } else {
-        const status = api.profileId === user_id ? true : false;
+        const status = api.profileId === profileId ? true : false;
         return status;
       }
     } catch (error) {

@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 export class CreateApiDto {
   @ApiProperty()
   name: string;
@@ -8,10 +8,4 @@ export class CreateApiDto {
 
   @ApiProperty()
   base_url: string;
-
-  @ApiProperty()
-  category: string;
-
-  @ApiPropertyOptional()
-  subscribers: string[];
 }
