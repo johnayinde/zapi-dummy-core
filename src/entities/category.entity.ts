@@ -5,11 +5,11 @@ import { Api } from './api.entity';
 @Entity()
 export class Category extends SharedEntity {
   @Column({ unique: true })
-  category: string;
+  name: string;
 
-  @Column()
+  @Column({ nullable: true })
   description: string;
 
-  @OneToMany(() => Api, (api) => api.category)
+  @OneToMany(() => Api, (api) => api.categoryId)
   api: Api[];
 }

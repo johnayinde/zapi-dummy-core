@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { configConstant } from './common/constants/config.constant';
-import { PricingModule } from './pricing/pricing.module';
+import { ApiModule } from './api/api.module';
 
 @Module({
   imports: [
@@ -26,7 +26,7 @@ import { PricingModule } from './pricing/pricing.module';
       }),
       inject: [ConfigService],
     }),
-    PricingModule,
+    ApiModule,
   ],
   controllers: [AppController],
   providers: [AppService],
