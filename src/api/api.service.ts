@@ -64,7 +64,7 @@ export class ApiService {
   /**
    * It takes in an object with a name and value property, and then uses the name property to find the
    * value property in the database.
-   * @param {any}  - name - the name of the field you want to search for
+   * @param {any}  - name - the name of the field you want to search for - value - value you are searching with
    * @returns An array of Api objects.
    */
   async customFind({ name, value }: any): Promise<Api[]> {
@@ -107,7 +107,7 @@ export class ApiService {
   /**
    * It finds an api by id, if it exists, it removes it, if it doesn't exist, it throws a
    * NotFoundException
-   * @param {string} id - number - The id of the api to be deleted
+   * @param {string} id - The id of the api to be deleted
    * @returns The api object that was removed.
    */
   async remove(id: string, profileId: string): Promise<Api> {
