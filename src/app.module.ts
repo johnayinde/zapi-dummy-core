@@ -5,6 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { configConstant } from './common/constants/config.constant';
 import { ApiModule } from './api/api.module';
+import { PricingModule } from './pricing/pricing.module';
 
 @Module({
   imports: [
@@ -26,7 +27,7 @@ import { ApiModule } from './api/api.module';
       }),
       inject: [ConfigService],
     }),
-    ApiModule,
+    ApiModule, PricingModule
   ],
   controllers: [AppController],
   providers: [AppService],
