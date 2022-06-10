@@ -51,8 +51,7 @@ export class ApiController {
     const api = await this.apiService.findOneById(id);
     return ZapiResponse.Ok(api, 'Ok', '200');
   }
-
-  /* This is a post request that takes in query name and value and returns a promise of an Api */
+  /* This is a post request that takes in a body and returns a promise of an Api. */
   @Post('custom_find')
   @ApiOperation({ summary: 'Get apis by query' })
   async customFind(@Body() customFindDto: CustomFindDto) {
@@ -60,11 +59,11 @@ export class ApiController {
     return ZapiResponse.Ok(api, 'Ok', '200');
   }
 
-  /* A delete request that takes in an id and returns the apiService.remove(+id) */
+  /* This is a delete request that takes in an id and profileId and returns a promise of an Api. */
   @Delete(':id')
   @ApiOperation({ summary: 'Delete an API' })
-  async remove(@Param('id') id: string, @Query('user_id') user_id: string) {
-    const api = await this.apiService.remove(id, user_id);
+  async remove(@Param('id') id: string, @Query('profileId') profileId: string) {
+    const api = await this.apiService.remove(id, profileId);
     return ZapiResponse.Ok(api, 'Ok', '200');
   }
 }

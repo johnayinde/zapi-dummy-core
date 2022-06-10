@@ -10,6 +10,6 @@ export class Category extends SharedEntity {
   @Column({ nullable: true })
   description: string;
 
-  @OneToMany(() => Api, (api) => api.categoryId)
+  @OneToMany(() => Api, (api) => api.category)
   api: Api[];
 }
