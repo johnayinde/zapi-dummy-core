@@ -1,6 +1,6 @@
 import { Profile } from './profile.entity';
 import { SharedEntity } from '../common/model/sharedEntity';
-import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToMany } from 'typeorm';
 
 @Entity()
 export class Organisation extends SharedEntity {
@@ -11,7 +11,7 @@ export class Organisation extends SharedEntity {
   number_of_seats: number;
 
   @Column({ nullable: true })
-  number_of_employees: string;
+  number_of_employees: number;
 
   @Column({ nullable: true })
   mail_extension: string; // mail extension that is unique to the organisation
@@ -20,7 +20,7 @@ export class Organisation extends SharedEntity {
   // Organisation monthly bills based on its number of seats
   price_per_month: number;
 
-  @OneToOne(() => Profile)
+  @ManyToMany(() => Profile)
   @JoinColumn()
   profile: Profile;
 }
