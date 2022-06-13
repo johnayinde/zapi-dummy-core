@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { CategoriesModule } from './categories/categories.module';
 import { configConstant } from './common/constants/config.constant';
 import { ApiModule } from './api/api.module';
 import { PricingModule } from './pricing/pricing.module';
@@ -27,7 +28,9 @@ import { PricingModule } from './pricing/pricing.module';
       }),
       inject: [ConfigService],
     }),
-    ApiModule, PricingModule
+    ApiModule,
+    PricingModule,
+    CategoriesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
