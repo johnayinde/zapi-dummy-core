@@ -7,6 +7,7 @@ import { ZapiResponse } from 'src/common/helpers/response';
 import { APIRepository } from 'src/database/repository/api.repository';
 import { Api } from 'src/entities/api.entity';
 import { CreateApiDto } from './dto/create-api.dto';
+import { UpdateApiDto } from './dto/update-api.dto';
 
 /* The ApiService class is a service that uses the APiRepository class to do crud operation */
 @Injectable()
@@ -14,11 +15,7 @@ export class ApiService {
   constructor(private readonly apiRepository: APIRepository) {}
 
   /* Checking if the api name already exists in the database. */
-  async create(
-    profileId: string,
-    categoryId: string,
-    createApiDto: CreateApiDto,
-  ): Promise<Api> {
+  async create(profileId: string, createApiDto: CreateApiDto): Promise<Api> {
     try {
       const api = await this.apiRepository.findOne({
         where: { name: createApiDto.name },
@@ -35,7 +32,6 @@ export class ApiService {
 
       const newApi = this.apiRepository.create({
         ...createApiDto,
-        categoryId,
         profileId,
       });
 
@@ -103,6 +99,44 @@ export class ApiService {
       );
     }
   }
+  /**
+   * It checks if the user is the owner of the api, if yes, it updates the api.
+   * </code>
+   * @param {string} apiId - The id of the api to be updated.
+   * @param {string} profileId - The id of the user who is trying to update the api.
+   * @param {UpdateApiDto} updateApiDto - UpdateApiDto
+   * @returns The update method returns a promise of type UpdateResult.
+   */
+  async update(
+    apiId: string,
+    profileId: string,
+    updateApiDto: UpdateApiDto,
+  ): Promise<Api> {
+    try {
+      const api = await this.apiRepository.findOne(apiId);
+      if (api) {
+        /* Checking if the user is the owner of the api. */
+        const verified = await this.verify(apiId, profileId);
+        if (verified === false) {
+          throw new NotFoundException(
+            ZapiResponse.BadRequest('Forbidden', 'Unauthorized action', '403'),
+          );
+        }
+
+        await this.apiRepository.update(apiId, updateApiDto);
+        const updatedApi = await this.apiRepository.findOne(apiId);
+        if (updatedApi) {
+          return updatedApi;
+        }
+      } else {
+        ZapiResponse.NotFoundRequest('Not Found', 'Api does not exist', '404');
+      }
+    } catch (error) {
+      throw new BadRequestException(
+        ZapiResponse.BadRequest('Server error', error, '500'),
+      );
+    }
+  }
 
   /**
    * It finds an api by id, if it exists, it removes it, if it doesn't exist, it throws a
@@ -140,10 +174,10 @@ export class ApiService {
    * @param {string} profileId - The profileId is the id of the profile that is being verified.
    * @returns A boolean value
    */
-  async verify(api_id: string, profileId: string): Promise<boolean> {
+  async verify(apiId: string, profileId: string): Promise<boolean> {
     try {
       const api = await this.apiRepository.findOne({
-        id: api_id,
+        id: apiId,
       });
       if (!api) {
         throw new NotFoundException(

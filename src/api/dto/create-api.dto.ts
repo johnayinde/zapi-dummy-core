@@ -7,5 +7,5 @@ export class CreateApiDto {
   description: string;
 
   @ApiProperty()
-  base_url: string;
+  categoryId: string;
 }
