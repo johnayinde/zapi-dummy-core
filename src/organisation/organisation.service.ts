@@ -5,7 +5,7 @@ import { OrganisationRepository } from 'src/database/repository/organisation.rep
 import { ProfileRepository } from 'src/database/repository/profile.repository';
 import { ProfileOrgRepository } from 'src/database/repository/profileOrg.repository';
 import { ProfileOrg } from 'src/entities/profile-org.entity';
-import { ProfileDto } from 'src/organisation/dto/profile-dto';
+// import { ProfileDto } from 'src/organisation/dto/profile-dto';
 import { OrganisationDto } from './dto/create-org.dto';
 import { OrgUserDto } from './dto/create-user.dto';
 
@@ -17,10 +17,11 @@ export class OrganisationService {
     private readonly profileRepo: ProfileRepository,
   ) {}
 
-  async createProfile(profileDto: ProfileDto) {
-    const profile = this.profileRepo.create(profileDto);
-    return await this.profileRepo.save(profile);
-  }
+  // TO test origanisation module
+  // async createProfile(profileDto: ProfileDto) {
+  //   const profile = this.profileRepo.create(profileDto);
+  //   return await this.profileRepo.save(profile);
+  // }
 
   async createOrganisation(profileId: string, orgDto: OrganisationDto) {
     try {
@@ -37,6 +38,7 @@ export class OrganisationService {
       }
 
       const profile = await this.profileRepo.findOne(profileId);
+
       const mail_extension = profile.email.substring(
         profile.email.lastIndexOf('@') + 1,
       );
@@ -49,19 +51,8 @@ export class OrganisationService {
         profile: profile,
         mail_extension: mail_extension,
       });
-      const organisationEntry = await this.orgRepo.save(newOrg);
 
-      // Add Admin to organisation
-      // const organisation = await this.orgRepo.findOne({
-      //   where: { name: orgDto.name },
-      // });
-      if (organisationEntry) {
-        this.addUserToOrg(organisation.id, {
-          email: profile.email,
-          role: OrgRole.ADMIN,
-        });
-      }
-      return organisationEntry;
+      return await this.orgRepo.save(newOrg);
     } catch (error) {
       throw new BadRequestException(
         ZapiResponse.BadRequest('Server error', error, '500'),
@@ -69,32 +60,42 @@ export class OrganisationService {
     }
   }
 
-  async addUserToOrg(id: string, orguserDto: OrgUserDto): Promise<ProfileOrg> {
-    const profile = await this.profileRepo.findOne({
-      where: { email: orguserDto.email },
-    });
-    const organisation = await this.orgRepo.findOne(id);
-    const existingUser = this.profileOrgRepo.find({
-      where: { profile: profile, organisation: organisation },
-    });
-    if (existingUser) {
+  async addUserToOrg(id: string, orgUserDto: OrgUserDto): Promise<ProfileOrg> {
+    try {
+      const profile = await this.profileRepo.findOne({
+        where: { email: orgUserDto.email },
+      });
+      if (!profile) {
+        throw new BadRequestException(
+          ZapiResponse.BadRequest(
+            'Non-existing Values',
+            'This profile does not exist',
+          ),
+        );
+      }
+      const organisation = await this.orgRepo.findOne(id);
+      const existingUser = await this.profileOrgRepo.findOne({
+        where: { profile: profile, organisation: organisation },
+      });
+      if (existingUser) {
+        throw new BadRequestException(
+          ZapiResponse.BadRequest(
+            'Existing Values',
+            'This User is already registered in this organisation',
+          ),
+        );
+      }
+      const newUser = this.profileOrgRepo.create({
+        organisation: organisation,
+        profile: profile,
+        role: orgUserDto.role,
+      });
+      return await this.profileOrgRepo.save(newUser);
+    } catch (error) {
       throw new BadRequestException(
-        ZapiResponse.BadRequest(
-          'Existing Values',
-          'An Organisation with this name already exist, use another name',
-        ),
+        ZapiResponse.BadRequest('Server error', error, '500'),
       );
     }
-    const newUser = this.profileOrgRepo.create({
-      organisation: organisation,
-      profile: profile,
-      role: orguserDto.role,
-    });
-    return await this.profileOrgRepo.save(newUser);
-  }
-
-  async getAllOrganisation() {
-    return await this.orgRepo.find();
   }
 
   async findUsersByOrg(id: string) {
@@ -102,5 +103,13 @@ export class OrganisationService {
     return await this.profileOrgRepo.find({
       where: { organisation: organisation },
     });
+  }
+
+  async findOrganisationById(id: string) {
+    return await this.orgRepo.findOne(id);
+  }
+
+  async getAllOrganisation() {
+    return await this.orgRepo.find();
   }
 }
