@@ -27,7 +27,8 @@ import { PricingModule } from './pricing/pricing.module';
       }),
       inject: [ConfigService],
     }),
-    ApiModule, PricingModule
+    ApiModule,
+    PricingModule,
   ],
   controllers: [AppController],
   providers: [AppService],
