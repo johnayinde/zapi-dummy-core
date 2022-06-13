@@ -1,9 +1,9 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { OrgRole } from 'src/common/enums/orgRole.enum';
 import { ZapiResponse } from 'src/common/helpers/response';
 import { OrganisationRepository } from 'src/database/repository/organisation.repository';
 import { ProfileRepository } from 'src/database/repository/profile.repository';
 import { ProfileOrgRepository } from 'src/database/repository/profileOrg.repository';
+import { Organisation } from 'src/entities/organisation.entity';
 import { ProfileOrg } from 'src/entities/profile-org.entity';
 // import { ProfileDto } from 'src/organisation/dto/profile-dto';
 import { OrganisationDto } from './dto/create-org.dto';
@@ -31,17 +31,20 @@ export class OrganisationService {
       if (organisation) {
         throw new BadRequestException(
           ZapiResponse.BadRequest(
-            'Existing Values',
+            'Unauthorized',
             'An Organisation with this name already exist, use another name',
+            '401',
           ),
         );
       }
 
       const profile = await this.profileRepo.findOne(profileId);
 
-      const mail_extension = profile.email.substring(
-        profile.email.lastIndexOf('@') + 1,
-      );
+      if (!profile) {
+        throw new BadRequestException(
+          ZapiResponse.BadRequest('Not Found', 'Profile does not exist', '404'),
+        );
+      }
 
       const newOrg = this.orgRepo.create({
         name: orgDto.name,
@@ -49,13 +52,12 @@ export class OrganisationService {
         number_of_employees: orgDto.number_of_employees,
         price_per_month: 0,
         profile: profile,
-        mail_extension: mail_extension,
       });
 
       return await this.orgRepo.save(newOrg);
     } catch (error) {
       throw new BadRequestException(
-        ZapiResponse.BadRequest('Server error', error, '500'),
+        ZapiResponse.BadRequest('Internal Server Error', error, '500'),
       );
     }
   }
@@ -67,10 +69,7 @@ export class OrganisationService {
       });
       if (!profile) {
         throw new BadRequestException(
-          ZapiResponse.BadRequest(
-            'Non-existing Values',
-            'This profile does not exist',
-          ),
+          ZapiResponse.BadRequest('Not Found', 'User does not exist', '404'),
         );
       }
       const organisation = await this.orgRepo.findOne(id);
@@ -80,8 +79,9 @@ export class OrganisationService {
       if (existingUser) {
         throw new BadRequestException(
           ZapiResponse.BadRequest(
-            'Existing Values',
+            'Unauthorized',
             'This User is already registered in this organisation',
+            '401',
           ),
         );
       }
@@ -93,23 +93,23 @@ export class OrganisationService {
       return await this.profileOrgRepo.save(newUser);
     } catch (error) {
       throw new BadRequestException(
-        ZapiResponse.BadRequest('Server error', error, '500'),
+        ZapiResponse.BadRequest('Internal Server Error', error, '500'),
       );
     }
   }
 
-  async findUsersByOrg(id: string) {
+  async findUsersByOrg(id: string): Promise<ProfileOrg[]> {
     const organisation = this.orgRepo.findOne(id);
     return await this.profileOrgRepo.find({
       where: { organisation: organisation },
     });
   }
 
-  async findOrganisationById(id: string) {
+  async findOrganisationById(id: string): Promise<Organisation> {
     return await this.orgRepo.findOne(id);
   }
 
-  async getAllOrganisation() {
+  async getAllOrganisation(): Promise<Organisation[]> {
     return await this.orgRepo.find();
   }
 }
