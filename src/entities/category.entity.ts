@@ -1,5 +1,11 @@
 import { SharedEntity } from '../common/model/sharedEntity';
-import { Column, Entity, OneToMany } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Api } from './api.entity';
 
 @Entity()
@@ -10,6 +16,7 @@ export class Category extends SharedEntity {
   @Column({ nullable: true })
   description: string;
 
-  @OneToMany(() => Api, (api) => api.category)
+  @OneToMany((_type) => Api, (api) => api.category, { eager: true })
+  @JoinColumn()
   api: Api[];
 }
