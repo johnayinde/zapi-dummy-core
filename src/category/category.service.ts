@@ -25,7 +25,7 @@ export class CategoryService {
 
   async getCategoryById(id: string) {
     try {
-      const found = this.categoryRepository.findOne({ id });
+      const found = await this.categoryRepository.findOne({ id });
       return found;
     } catch (error) {
       if (error.code === '22P02') {
