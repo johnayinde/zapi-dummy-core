@@ -1,11 +1,10 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
+import { OrgRole } from 'src/common/enums/orgRole.enum';
 import { ZapiResponse } from 'src/common/helpers/response';
 import { OrganisationRepository } from 'src/database/repository/organisation.repository';
 import { ProfileRepository } from 'src/database/repository/profile.repository';
 import { ProfileOrgRepository } from 'src/database/repository/profileOrg.repository';
 import { Organisation } from 'src/entities/organisation.entity';
-import { ProfileOrg } from 'src/entities/profile-org.entity';
-// import { ProfileDto } from 'src/organisation/dto/profile-dto';
 import { OrganisationDto } from './dto/create-org.dto';
 import { OrgUserDto } from './dto/create-user.dto';
 
@@ -16,12 +15,6 @@ export class OrganisationService {
     private readonly profileOrgRepo: ProfileOrgRepository,
     private readonly profileRepo: ProfileRepository,
   ) {}
-
-  // TO test origanisation module
-  // async createProfile(profileDto: ProfileDto) {
-  //   const profile = this.profileRepo.create(profileDto);
-  //   return await this.profileRepo.save(profile);
-  // }
 
   async createOrganisation(profileId: string, orgDto: OrganisationDto) {
     try {
@@ -52,18 +45,51 @@ export class OrganisationService {
         number_of_employees: orgDto.number_of_employees,
         price_per_month: 0,
         profile: profile,
+        profileId: profile.id,
       });
 
-      return await this.orgRepo.save(newOrg);
+      const organisationEntry = await this.orgRepo.save(newOrg);
+      this.addUserToOrg(organisationEntry.id, profile.id, {
+        email: profile.email,
+        role: OrgRole.ADMIN,
+      });
+      return organisationEntry;
     } catch (error) {
       throw new BadRequestException(
-        ZapiResponse.BadRequest('Internal Server Error', error, '500'),
+        ZapiResponse.BadRequest('Server Error', error, '500'),
       );
     }
   }
 
-  async addUserToOrg(id: string, orgUserDto: OrgUserDto): Promise<ProfileOrg> {
+  async addUserToOrg(id: string, profileId: string, orgUserDto: OrgUserDto) {
     try {
+      const organisation = await this.orgRepo.findOne(id);
+      if (!organisation) {
+        throw new BadRequestException(
+          ZapiResponse.BadRequest(
+            'Not Found',
+            'Organisation does not exist',
+            '404',
+          ),
+        );
+      }
+
+      // ensure that only admin can add users to org
+      if (orgUserDto.role === OrgRole.DEVELOPER) {
+        const user = await this.profileOrgRepo.findOne({
+          where: { profileId: profileId, organisationId: id },
+        });
+        if (user.role !== OrgRole.ADMIN) {
+          throw new BadRequestException(
+            ZapiResponse.BadRequest(
+              'Unauthorized',
+              'Only admin can add user to this organisation',
+              '401',
+            ),
+          );
+        }
+      }
+
       const profile = await this.profileRepo.findOne({
         where: { email: orgUserDto.email },
       });
@@ -72,9 +98,8 @@ export class OrganisationService {
           ZapiResponse.BadRequest('Not Found', 'User does not exist', '404'),
         );
       }
-      const organisation = await this.orgRepo.findOne(id);
       const existingUser = await this.profileOrgRepo.findOne({
-        where: { profile: profile, organisation: organisation },
+        where: { profileId: profile.id, organisationId: id },
       });
       if (existingUser) {
         throw new BadRequestException(
@@ -87,7 +112,9 @@ export class OrganisationService {
       }
       const newUser = this.profileOrgRepo.create({
         organisation: organisation,
+        organisationId: id,
         profile: profile,
+        profileId: profile.id,
         role: orgUserDto.role,
       });
       return await this.profileOrgRepo.save(newUser);
@@ -98,18 +125,36 @@ export class OrganisationService {
     }
   }
 
-  async findUsersByOrg(id: string): Promise<ProfileOrg[]> {
-    const organisation = this.orgRepo.findOne(id);
-    return await this.profileOrgRepo.find({
-      where: { organisation: organisation },
-    });
+  async findUsersByOrg(id: string) {
+    try {
+      const organisation = await this.orgRepo.findOne(id);
+      return await this.profileOrgRepo.find({
+        where: { organisation: organisation },
+      });
+    } catch (error) {
+      throw new BadRequestException(
+        ZapiResponse.BadRequest('Server error', error, '500'),
+      );
+    }
   }
 
   async findOrganisationById(id: string): Promise<Organisation> {
-    return await this.orgRepo.findOne(id);
+    try {
+      return await this.orgRepo.findOne(id);
+    } catch (error) {
+      throw new BadRequestException(
+        ZapiResponse.BadRequest('Server error', error, '500'),
+      );
+    }
   }
 
   async getAllOrganisation(): Promise<Organisation[]> {
-    return await this.orgRepo.find();
+    try {
+      return await this.orgRepo.find();
+    } catch (error) {
+      throw new BadRequestException(
+        ZapiResponse.BadRequest('Server error', error, '500'),
+      );
+    }
   }
 }
