@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Pricing } from '../entities/pricing.entity';
-import { PricingRepository } from '../database/repository/pricing.repository.entity';
+import { PricingRepository } from '../database/repository/pricing.repository';
 import { PricingDto } from './dto/create-pricing.dto';
 import { ZapiResponse } from '../common/helpers/response';
 import { PriceGroup } from '../entities/price-group.entity';

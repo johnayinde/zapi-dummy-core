@@ -21,7 +21,7 @@ import { PricingModule } from './pricing/pricing.module';
           .get<string>(configConstant.database.password)
           ?.toString(),
         database: configService.get(configConstant.database.name),
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        entities: [__dirname + 'dist/entities/*.entity{.ts,.js}'],
         autoLoadEntities: true,
         synchronize: false,
       }),
