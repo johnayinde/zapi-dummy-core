@@ -6,6 +6,16 @@ import { AppService } from './app.service';
 import { configConstant } from './common/constants/config.constant';
 import { ApiModule } from './api/api.module';
 import { PricingModule } from './pricing/pricing.module';
+import { Api } from './entities/api.entity';
+import { Category } from './entities/category.entity';
+import { Discussion } from './entities/discussion.entity';
+import { Endpoint } from './entities/endpoint.entity';
+import { Organisation } from './entities/organisation.entity';
+import { PriceGroup } from './entities/price-group.entity';
+import { Pricing } from './entities/pricing.entity';
+import { ProfileOrg } from './entities/profile-org.entity';
+import { Profile } from './entities/profile.entity';
+import { Tutorial } from './entities/tutorial.entity';
 
 @Module({
   imports: [
@@ -21,7 +31,18 @@ import { PricingModule } from './pricing/pricing.module';
           .get<string>(configConstant.database.password)
           ?.toString(),
         database: configService.get(configConstant.database.name),
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        entities: [
+          Api,
+          Category,
+          Discussion,
+          Endpoint,
+          Organisation,
+          PriceGroup,
+          Pricing,
+          ProfileOrg,
+          Profile,
+          Tutorial,
+        ],
         autoLoadEntities: true,
         synchronize: false,
       }),
