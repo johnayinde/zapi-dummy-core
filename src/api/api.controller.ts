@@ -6,6 +6,7 @@ import {
   Param,
   Delete,
   Query,
+  Put,
 } from '@nestjs/common';
 import { ApiService } from './api.service';
 import { CreateApiDto } from './dto/create-api.dto';
@@ -14,6 +15,7 @@ import { ZapiResponse } from 'src/common/helpers/response/Response';
 import { Ok } from 'src/common/helpers/response/ResponseType';
 import { Api } from '../entities/api.entity';
 import { CustomFindDto } from './dto/customFind.dto';
+import { UpdateApiDto } from './dto/update-api.dto';
 
 @ApiTags('Apis')
 @Controller('api')
@@ -25,14 +27,9 @@ export class ApiController {
   @ApiOperation({ summary: 'Add a new api' })
   async create(
     @Param('profileId') profileId: string,
-    @Query('categoryId') categoryId: string,
     @Body() createApiDto: CreateApiDto,
   ): Promise<Ok<Api>> {
-    const api = await this.apiService.create(
-      profileId,
-      categoryId,
-      createApiDto,
-    );
+    const api = await this.apiService.create(profileId, createApiDto);
     return ZapiResponse.Ok(api, 'Api Created', '201');
   }
 
@@ -57,6 +54,19 @@ export class ApiController {
   async customFind(@Body() customFindDto: CustomFindDto) {
     const api = await this.apiService.customFind(customFindDto);
     return ZapiResponse.Ok(api, 'Ok', '200');
+  }
+
+  /* A put request that takes in an apiId, profileId, and a body and returns a promise of an
+  UpdateResult. */
+  @Put(':apiId')
+  @ApiOperation({ summary: 'Update api' })
+  async update(
+    @Param('apiId') apiId: string,
+    @Query('profileId') profileId: string,
+    @Body() updateApiDto: UpdateApiDto,
+  ): Promise<Ok<Api>> {
+    const api = await this.apiService.update(apiId, profileId, updateApiDto);
+    return ZapiResponse.Ok(api, 'Api Updated', '200');
   }
 
   /* This is a delete request that takes in an id and profileId and returns a promise of an Api. */

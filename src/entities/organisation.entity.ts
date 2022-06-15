@@ -3,6 +3,7 @@ import { SharedEntity } from '../common/model/sharedEntity';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { ProfileOrg } from './profile-org.entity';
 
+
 @Entity()
 export class Organisation extends SharedEntity {
   @Column({ length: 200, unique: true })
