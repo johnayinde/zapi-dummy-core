@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { OrganisationDto } from './dto/create-org.dto';
 import { OrganisationService } from './organisation.service';
@@ -34,6 +42,13 @@ export class OrganisationController {
     return ZapiResponse.Ok(user, 'User added to organisation', '201');
   }
 
+  @Get()
+  @ApiOperation({ summary: 'Get all organisations' })
+  async getAllOrganisation() {
+    const allOrgs = await this.orgService.getAllOrganisation();
+    return ZapiResponse.Ok(allOrgs, 'All organisation', '201');
+  }
+
   @Get('/:id')
   @ApiOperation({ summary: 'Get one organisations' })
   async getOrganisationById(@Param('id') id: string) {
@@ -47,4 +62,16 @@ export class OrganisationController {
     const users = await this.orgService.findUsersByOrg(id);
     return ZapiResponse.Ok(users, 'All users of an organisation', '200');
   }
+
+  @Put()
+  @ApiOperation({ summary: 'Update an existing organisation' })
+  async updateOrganisation() {}
+
+  @Delete()
+  @ApiOperation({ summary: 'Delete an existing organisation and its users' })
+  async removeOrganisation() {}
+
+  @Delete()
+  @ApiOperation({ summary: 'Delete a user in an organisation' })
+  async removeUsers() {}
 }
