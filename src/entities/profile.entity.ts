@@ -1,8 +1,10 @@
+import { Organisation } from './organisation.entity';
 import { SharedEntity } from '../common/model/sharedEntity';
 import { Column, Entity, OneToMany } from 'typeorm';
 import { Api } from './api.entity';
 import { ProfileOrg } from './profile-org.entity';
 import { Organisation } from './organisation.entity';
+
 
 @Entity()
 export class Profile extends SharedEntity {
