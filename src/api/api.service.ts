@@ -38,7 +38,7 @@ export class ApiService {
       return await this.apiRepository.save(newApi);
     } catch (error) {
       throw new BadRequestException(
-        ZapiResponse.BadRequest('Server error', error, '500'),
+        ZapiResponse.BadRequest('Server error', '500 Internal Server Error'),
       );
     }
   }
@@ -52,7 +52,7 @@ export class ApiService {
       return await this.apiRepository.find();
     } catch (error) {
       throw new BadRequestException(
-        ZapiResponse.BadRequest('Server error', error, '500'),
+        ZapiResponse.BadRequest('Server error', '500 Internal Server Error'),
       );
     }
   }
@@ -70,7 +70,7 @@ export class ApiService {
       });
     } catch (error) {
       throw new BadRequestException(
-        ZapiResponse.BadRequest('Server error', error, '500'),
+        ZapiResponse.BadRequest('Server error', '500 Internal Server Error'),
       );
     }
   }
@@ -95,7 +95,7 @@ export class ApiService {
       return api;
     } catch (error) {
       throw new BadRequestException(
-        ZapiResponse.BadRequest('Server error', error, '500'),
+        ZapiResponse.BadRequest('Server error', '500 Internal Server Error'),
       );
     }
   }
@@ -133,7 +133,7 @@ export class ApiService {
       }
     } catch (error) {
       throw new BadRequestException(
-        ZapiResponse.BadRequest('Server error', error, '500'),
+        ZapiResponse.BadRequest('Server error', '500 Internal Server Error'),
       );
     }
   }
@@ -162,7 +162,7 @@ export class ApiService {
       );
     } catch (error) {
       throw new BadRequestException(
-        ZapiResponse.BadRequest('Server error', error, '500'),
+        ZapiResponse.BadRequest('Server error', '500 Internal Server Error'),
       );
     }
   }
@@ -193,7 +193,7 @@ export class ApiService {
       }
     } catch (error) {
       throw new BadRequestException(
-        ZapiResponse.BadRequest('Server error', error, '500'),
+        ZapiResponse.BadRequest('Server error', '500 Internal Server Error'),
       );
     }
   }

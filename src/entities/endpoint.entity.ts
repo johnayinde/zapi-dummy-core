@@ -1,24 +1,40 @@
 import { SharedEntity } from '../common/model/sharedEntity';
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { Api } from './api.entity';
+import { HttpMethod } from '../common/enums/httpMethods.enum';
 
 @Entity()
 export class Endpoint extends SharedEntity {
   @Column()
-  title: string;
+  name: string;
 
-  @Column()
-  http_method: string;
+  @Column({
+    type: 'enum',
+    enum: HttpMethod,
+    default: HttpMethod.GET,
+    nullable: true,
+  })
+  method: HttpMethod;
 
   @Column()
   route: string;
 
-  @Column({ nullable: true })
-  description?: string;
+  @Column()
+  apiId: string;
 
   @Column()
-  route_type: string;
+  description: string;
+
+  @Column('text', {
+    array: true,
+    nullable: true,
+  })
+  headers: object[];
+
+  @Column('jsonb', { default: {} })
+  requestBody: object;
 
   @ManyToOne(() => Api, (api) => api.endpoints, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'apiId' })
   api: Api;
 }

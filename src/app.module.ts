@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { configConstant } from './common/constants/config.constant';
 import { ApiModule } from './api/api.module';
 import { PricingModule } from './pricing/pricing.module';
+import { EndpointsModule } from './endpoints/endpoints.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { PricingModule } from './pricing/pricing.module';
     }),
     ApiModule,
     PricingModule,
+    EndpointsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
