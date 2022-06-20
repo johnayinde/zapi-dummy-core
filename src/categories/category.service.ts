@@ -3,8 +3,8 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { ZapiResponse } from 'src/common/helpers/response';
-import { Category } from 'src/entities/category.entity';
+import { ZapiResponse } from '../common/helpers/response';
+import { Category } from '../entities/category.entity';
 import { CategoryRepository } from '../database/repository/category.repository';
 import { CreateCategoriesDto } from './dto/categories.dto';
 
@@ -22,7 +22,8 @@ export class CategoryService {
         throw new BadRequestException(
           ZapiResponse.BadRequest(
             'Existing Values',
-            'An Categorty with this name already exists',
+            'A Categorty with this name already exists',
+            '400'
           ),
         );
       }
@@ -30,30 +31,32 @@ export class CategoryService {
       const newCategory = this.categoryRepository.create({
         ...payload,
       });
-      await this.categoryRepository.save(newCategory);
-      return newCategory;
+      const savedCategory = await this.categoryRepository.save(newCategory);
+      return savedCategory;
     } catch (error) {
       throw new BadRequestException(
-        ZapiResponse.BadRequest('Server error', error, '500'),
+        ZapiResponse.BadRequest(error.name, error.message, error.status,)
       );
     }
   }
 
   async getCategory(): Promise<Category[]> {
     try {
-      return await this.categoryRepository.find();
+      const allCategories = await this.categoryRepository.find()
+      return allCategories;
     } catch (error) {
       throw new BadRequestException(
-        ZapiResponse.BadRequest('Server error', error, '500'),
+        ZapiResponse.BadRequest(error.name, error.message, error.status,),
       );
     }
   }
 
-  async deleteCategogry(id: string): Promise<Category> {
+  async deleteCategogry(id: string): Promise<string> {
     try {
       const category = await this.categoryRepository.findOne(id);
       if (category) {
-        return await this.categoryRepository.remove(category);
+         await this.categoryRepository.remove(category);
+         return  `${category.name} category successfully deleted`
       }
       throw new NotFoundException(
         ZapiResponse.NotFoundRequest(
@@ -64,7 +67,7 @@ export class CategoryService {
       );
     } catch (error) {
       throw new BadRequestException(
-        ZapiResponse.BadRequest('Server error', error, '500'),
+        ZapiResponse.BadRequest(error.name, error.message, error.status),
       );
     }
   }
@@ -84,7 +87,7 @@ export class CategoryService {
       return category;
     } catch (error) {
       throw new BadRequestException(
-        ZapiResponse.BadRequest('Server error', error, '500'),
+        ZapiResponse.BadRequest(error.name, error.message, error.status),
       );
     }
   }

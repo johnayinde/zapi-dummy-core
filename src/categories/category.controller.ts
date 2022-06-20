@@ -7,8 +7,9 @@ import {
   ValidationPipe,
   Delete,
   Param,
+  ParseUUIDPipe
 } from '@nestjs/common';
-import { ZapiResponse } from 'src/common/helpers/response/Response';
+import { ZapiResponse } from '../common/helpers/response/Response';
 import { Ok } from 'src/common/helpers/response/ResponseType';
 import { CategoryService } from './category.service';
 import { Category } from '../entities/category.entity';
@@ -30,18 +31,18 @@ export class CategoryController {
 
   @Get()
   async getCategory(): Promise<Ok<Category[]>> {
-    const category = await this.categoryservice.getCategory();
-    return ZapiResponse.Ok(category, 'Ok', '200');
+    const allCategories = await this.categoryservice.getCategory();
+    return ZapiResponse.Ok(allCategories, 'Ok', '200');
   }
 
   @Delete(':id')
-  async deleteCategogry(@Param('id') id: string) {
+  async deleteCategogry(@Param('id', new ParseUUIDPipe()) id: string) {
     const category = await this.categoryservice.deleteCategogry(id);
     return ZapiResponse.Ok(category, 'Ok', '200');
   }
 
   @Get(':id')
-  async findOneById(@Param('id') id: string) {
+  async findOneById(@Param('id', new ParseUUIDPipe()) id: string) {
     const category = await this.categoryservice.findOneById(id);
     return ZapiResponse.Ok(category, 'Ok', '200');
   }

@@ -7,6 +7,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { configConstant } from './common/constants/config.constant';
 import { ApiModule } from './api/api.module';
 import { PricingModule } from './pricing/pricing.module';
+import { OrganisationModule } from './organisation/organisation.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { PricingModule } from './pricing/pricing.module';
     ApiModule,
     PricingModule,
     CategoriesModule,
+    OrganisationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

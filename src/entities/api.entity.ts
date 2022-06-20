@@ -16,7 +16,7 @@ export class Api extends SharedEntity {
   @Column()
   description: string;
 
-  @Column()
+  @Column({ nullable: true })
   base_url: string;
 
   @Column('text', { array: true, nullable: true, default: [] })
@@ -38,7 +38,7 @@ export class Api extends SharedEntity {
   @Column({
     type: 'enum',
     enum: Type,
-    default: Type.Public,
+    default: Type.Private,
   })
   type: Type;
 
@@ -82,7 +82,6 @@ export class Api extends SharedEntity {
   endpoints: Endpoint[];
 
   @OneToMany(() => PriceGroup, (priceGroup) => priceGroup.api)
-  @JoinColumn({ name: 'priceGroupId' })
   priceGroup: PriceGroup[];
 
   @ManyToOne(() => Profile, (profile) => profile.apis)
