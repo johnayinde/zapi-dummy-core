@@ -82,7 +82,6 @@ export class Api extends SharedEntity {
   endpoints: Endpoint[];
 
   @OneToMany(() => PriceGroup, (priceGroup) => priceGroup.api)
-  @JoinColumn({ name: 'priceGroupId' })
   priceGroup: PriceGroup[];
 
   @ManyToOne(() => Profile, (profile) => profile.apis)
