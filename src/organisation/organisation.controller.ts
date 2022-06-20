@@ -12,6 +12,7 @@ import { OrganisationDto } from './dto/create-org.dto';
 import { OrganisationService } from './organisation.service';
 import { OrgUserDto } from './dto/create-user.dto';
 import { ZapiResponse } from 'src/common/helpers/response';
+import { UpdateOrganisationDto } from './dto/update-org.dto';
 
 @ApiTags('Organisation')
 @Controller('organisation')
@@ -63,15 +64,28 @@ export class OrganisationController {
     return ZapiResponse.Ok(users, 'All users of an organisation', '200');
   }
 
-  @Put()
+  @Put('/:profileId/update/:id')
   @ApiOperation({ summary: 'Update an existing organisation' })
-  async updateOrganisation() {}
+  async updateOrganisation(
+    @Body() updateOrganisationDto: UpdateOrganisationDto,
+    @Param('id') id: string,
+    @Param('profileId') profileId: string,
+  ) {
+    const updatedOrganisation = this.orgService.updateOrganisation(
+      id,
+      profileId,
+      updateOrganisationDto,
+    );
+    return ZapiResponse.Ok(updatedOrganisation, 'Organisation updated', '200');
+  }
 
-  @Delete()
+  @Delete('/:profileId/delete/:id')
   @ApiOperation({ summary: 'Delete an existing organisation and its users' })
-  async removeOrganisation() {}
-
-  @Delete()
-  @ApiOperation({ summary: 'Delete a user in an organisation' })
-  async removeUsers() {}
+  async removeOrganisation(
+    @Param('id') id: string,
+    @Param('profileId') profileId: string,
+  ) {
+    const deletedOrg = this.orgService.removeOrganisation(id, profileId);
+    return ZapiResponse.Ok(deletedOrg, 'Organisation deleted', '200');
+  }
 }

@@ -1,4 +1,9 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { UpdateOrganisationDto } from './dto/update-org.dto';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { OrgRole } from 'src/common/enums/orgRole.enum';
 import { ZapiResponse } from 'src/common/helpers/response';
 import { OrganisationRepository } from 'src/database/repository/organisation.repository';
@@ -66,24 +71,6 @@ export class OrganisationService {
         ZapiResponse.BadRequest('Server Error', error, '500'),
       );
     }
-  }
-
-  async checkForAdminRole(
-    id: string,
-    profileId: string,
-    error_string = 'Only admin can add user to this organisation',
-  ) {
-    /* ensure that only admin can add users to org*/
-    const user = await this.profileOrgRepo.findOne({
-      where: { profileId: profileId, organisationId: id },
-    });
-
-    if (user.role !== OrgRole.ADMIN) {
-      throw new BadRequestException(
-        ZapiResponse.BadRequest('Unauthorized', error_string, '401'),
-      );
-    }
-    return;
   }
 
   /**
@@ -211,18 +198,19 @@ export class OrganisationService {
   async updateOrganisation(
     id: string,
     profileId: string,
-    orgDto: OrganisationDto,
+    updateOrgDto: UpdateOrganisationDto,
   ) {
     try {
-      await this.checkForAdminRole(
-        id,
-        profileId,
-        'Only Admin can update organisation',
-      );
-      const org = await this.orgRepo.findOne(id);
+      /*Check if organisation id and Profile Id exist */
+      const org = await this.verifyIds(id, profileId);
       if (org) {
         /* checking if Admin is updating*/
-        await this.orgRepo.update(id, orgDto);
+        await this.checkForAdminRole(
+          id,
+          profileId,
+          'Only Admin can update organisation',
+        );
+        await this.orgRepo.update(id, updateOrgDto);
         const updatedOrg = this.orgRepo.findOne(id);
         if (updatedOrg) {
           return updatedOrg;
@@ -243,15 +231,18 @@ export class OrganisationService {
 
   async removeOrganisation(id: string, profileId: string) {
     try {
-      /* checking if Admin is deleting*/
-      await this.checkForAdminRole(
-        id,
-        profileId,
-        'Only Admin can delete organisation',
-      );
-      const org = await this.orgRepo.findOne(id);
+      /*Check if organisation id and Profile Id exist */
+      const org = await this.verifyIds(id, profileId);
+
       if (org) {
         /* checking if Admin is deleting organisation*/
+        await this.checkForAdminRole(
+          id,
+          profileId,
+          'Only Admin can delete organisation',
+        );
+        /**Remove both users and organisation */
+        await this.removeOrgUsers(org.id);
         return await this.orgRepo.remove(org);
       }
       ZapiResponse.NotFoundRequest(
@@ -266,20 +257,92 @@ export class OrganisationService {
     }
   }
 
-  async removeUsers(id: string, profileId: string) {
+  async removeOrgUsers(id: string) {
     try {
-      /* checking if Admin is updating user*/
-      await this.checkForAdminRole(
-        id,
-        profileId,
-        'Only Admin can delete organisation',
-      );
-      const user = await this.profileOrgRepo.find({
-        where: { organisationId: id, profileId: profileId },
+      const users = await this.profileOrgRepo.find({
+        where: { organisationId: id },
       });
+      return await this.profileOrgRepo.remove(users);
+    } catch (error) {
+      throw new BadRequestException(
+        ZapiResponse.BadRequest('Server Error', error, '500'),
+      );
+    }
+  }
+
+  async removeUser(id: string, profileId: string, email: string) {
+    try {
+      /*Check if organisation id and Profile Id exist */
+      const org = await this.verifyIds(id, profileId);
+      /* checking if Admin is removing a user*/
+      if (org) {
+        await this.checkForAdminRole(
+          id,
+          profileId,
+          'Only Admin can delete organisation',
+        );
+        /**Verify email of user */
+        const userProfile = await this.profileRepo.findOne({
+          where: { email: email },
+        });
+
+        const user = await this.profileOrgRepo.find({
+          where: { organisationId: org.id, profileId: userProfile.id },
+        });
+        return await this.profileOrgRepo.remove(user);
+      }
     } catch (error) {
       throw new BadRequestException(
         ZapiResponse.BadRequest('Server error', error, '500'),
+      );
+    }
+  }
+
+  async checkForAdminRole(
+    id: string,
+    profileId: string,
+    error_string = 'Only admin can add user to this organisation',
+  ) {
+    /* ensure that only admin can add users to org*/
+    const user = await this.profileOrgRepo.findOne({
+      where: { profileId: profileId, organisationId: id },
+    });
+
+    if (user.role !== OrgRole.ADMIN) {
+      throw new BadRequestException(
+        ZapiResponse.BadRequest('Unauthorized', error_string, '401'),
+      );
+    }
+    return;
+  }
+
+  async verifyIds(id: string, profileId: string): Promise<Organisation> {
+    try {
+      const profile = await this.profileRepo.findOne(profileId);
+      if (!profile) {
+        throw new NotFoundException(
+          ZapiResponse.NotFoundRequest(
+            'No Found',
+            'Profile does not exist',
+            '404',
+          ),
+        );
+      }
+      const organisation = await this.orgRepo.findOne(id);
+      if (!organisation) {
+        throw new NotFoundException(
+          ZapiResponse.NotFoundRequest(
+            'No Found',
+            'Organisation does not exist',
+            '404',
+          ),
+        );
+      }
+
+      return organisation;
+    } catch (error) {
+      throw new BadRequestException(
+        ZapiResponse.BadRequest('Server Error', error, '500'),
       );
     }
   }
