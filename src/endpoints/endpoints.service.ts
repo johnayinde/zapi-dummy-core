@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ZapiResponse } from 'src/common/helpers/response';
 import { APIRepository } from 'src/database/repository/api.repository';
 import { EndpointRepository } from 'src/database/repository/endpoints.repository';
@@ -45,6 +49,70 @@ export class EndpointsService {
     } catch (error) {
       throw new BadRequestException(
         ZapiResponse.BadRequest('Server error', '500 Internal Server Error'),
+      );
+    }
+  }
+
+  /**
+   * It returns an array of Endpoint objects.
+   * @returns An array of Endpoint objects.
+   */
+  async findAll(): Promise<Endpoint[]> {
+    try {
+      return await this.endpointRepository.find();
+    } catch (error) {
+      throw new BadRequestException(
+        ZapiResponse.BadRequest('Server error', '500'),
+      );
+    }
+  }
+
+  /* Finding all endpoints that have the same apiId as the one passed in. */
+  async findByApiId(apiId: string): Promise<Endpoint[]> {
+    try {
+      const endpoints = await this.endpointRepository.find({
+        where: { apiId },
+      });
+      if (!endpoints) {
+        throw new NotFoundException(
+          ZapiResponse.NotFoundRequest(
+            'Not Found',
+            'No endpoints found',
+            '404',
+          ),
+        );
+      }
+      return endpoints;
+    } catch (error) {
+      throw new BadRequestException(
+        ZapiResponse.BadRequest('Internal Server Error', '500'),
+      );
+    }
+  }
+
+  /**
+   * It finds an endpoint by id and returns it
+   * @param {string} id - string - the id of the endpoint you want to find
+   * @returns The endpoint object
+   */
+  async findOneById(id: string): Promise<Endpoint> {
+    try {
+      const endpoint = await this.endpointRepository.findOne({
+        where: { id },
+      });
+      if (!endpoint) {
+        throw new NotFoundException(
+          ZapiResponse.NotFoundRequest(
+            'Not Found',
+            'Endpoint does not exist',
+            '404',
+          ),
+        );
+      }
+      return endpoint;
+    } catch (error) {
+      throw new BadRequestException(
+        ZapiResponse.BadRequest('Internal Server Error', '500'),
       );
     }
   }
