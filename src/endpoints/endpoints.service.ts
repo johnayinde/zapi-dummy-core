@@ -1,16 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ZapiResponse } from 'src/common/helpers/response';
-import { APIRepository } from 'src/database/repository/api.repository';
 import { EndpointRepository } from 'src/database/repository/endpoints.repository';
 import { Endpoint } from 'src/entities/endpoint.entity';
 import { CreateEndpointDto } from './dto/create-endpoint.dto';
 
 @Injectable()
 export class EndpointsService {
-  constructor(
-    private readonly endpointRepository: EndpointRepository,
-    private readonly apiRepository: APIRepository,
-  ) {}
+  constructor(private readonly endpointRepository: EndpointRepository) {}
 
   /**
    * It creates an endpoint and saves it to the database
@@ -44,7 +40,13 @@ export class EndpointsService {
       return savedEndpoint;
     } catch (error) {
       throw new BadRequestException(
-        ZapiResponse.BadRequest('Server error', '500 Internal Server Error'),
+        ZapiResponse.BadRequest(
+          'Internal Server error',
+          error instanceof Error
+            ? `${error.message}`
+            : 'An unknown error occured',
+          '500',
+        ),
       );
     }
   }

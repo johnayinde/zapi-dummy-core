@@ -38,7 +38,13 @@ export class ApiService {
       return await this.apiRepository.save(newApi);
     } catch (error) {
       throw new BadRequestException(
-        ZapiResponse.BadRequest('Server error', error, '500'),
+        ZapiResponse.BadRequest(
+          'Internal Server error',
+          error instanceof Error
+            ? `${error.message}`
+            : 'An unknown error occured',
+          '500',
+        ),
       );
     }
   }
@@ -52,7 +58,13 @@ export class ApiService {
       return await this.apiRepository.find();
     } catch (error) {
       throw new BadRequestException(
-        ZapiResponse.BadRequest('Server error', error, '500'),
+        ZapiResponse.BadRequest(
+          'Server error',
+          error instanceof Error
+            ? `${error.message}`
+            : 'An unknown error occured',
+          '500',
+        ),
       );
     }
   }
@@ -70,7 +82,13 @@ export class ApiService {
       });
     } catch (error) {
       throw new BadRequestException(
-        ZapiResponse.BadRequest('Server error', error, '500'),
+        ZapiResponse.BadRequest(
+          'Internal Server error',
+          error instanceof Error
+            ? `${error.message}`
+            : 'An unknown error occured',
+          '500',
+        ),
       );
     }
   }
@@ -95,7 +113,13 @@ export class ApiService {
       return api;
     } catch (error) {
       throw new BadRequestException(
-        ZapiResponse.BadRequest('Server error', error, '500'),
+        ZapiResponse.BadRequest(
+          'Internal Server error',
+          error instanceof Error
+            ? `${error.message}`
+            : 'An unknown error occured',
+          '500',
+        ),
       );
     }
   }
@@ -133,7 +157,13 @@ export class ApiService {
       }
     } catch (error) {
       throw new BadRequestException(
-        ZapiResponse.BadRequest('Server error', error, '500'),
+        ZapiResponse.BadRequest(
+          'Internal Server error',
+          error instanceof Error
+            ? `${error.message}`
+            : 'An unknown error occured',
+          '500',
+        ),
       );
     }
   }
@@ -162,7 +192,13 @@ export class ApiService {
       );
     } catch (error) {
       throw new BadRequestException(
-        ZapiResponse.BadRequest('Server error', error, '500'),
+        ZapiResponse.BadRequest(
+          'Internal Server error',
+          error instanceof Error
+            ? `${error.message}`
+            : 'An unknown error occured',
+          '500',
+        ),
       );
     }
   }
@@ -170,7 +206,7 @@ export class ApiService {
   /**
    * It checks if the profileId of the api is the same as the profileId of the user.
    * </code>
-   * @param {string} api_id - The id of the api
+   * @param {string} apiId - The id of the api
    * @param {string} profileId - The profileId is the id of the profile that is being verified.
    * @returns A boolean value
    */
@@ -193,7 +229,13 @@ export class ApiService {
       }
     } catch (error) {
       throw new BadRequestException(
-        ZapiResponse.BadRequest('Server error', error, '500'),
+        ZapiResponse.BadRequest(
+          'Internal Server error',
+          error instanceof Error
+            ? `${error.message}`
+            : 'An unknown error occured',
+          '500',
+        ),
       );
     }
   }

@@ -1,7 +1,6 @@
 import { SharedEntity } from '../common/model/sharedEntity';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { Discussion } from './discussion.entity';
-import { Tutorial } from './tutorial.entity';
 import { PriceGroup } from './price-group.entity';
 import { Status } from '../common/enums/apiVerification.enum';
 import { Profile } from './profile.entity';
@@ -68,10 +67,6 @@ export class Api extends SharedEntity {
   @OneToMany(() => Discussion, (discussion) => discussion.api)
   @JoinColumn({ name: 'discussionsId' })
   discussions: Discussion[];
-
-  @ManyToOne(() => Tutorial, (tutorial) => tutorial.api)
-  @JoinColumn({ name: 'tutorialsId' })
-  tutorials: Tutorial[];
 
   @OneToMany(() => PriceGroup, (priceGroup) => priceGroup.api)
   priceGroup: PriceGroup[];
