@@ -42,7 +42,7 @@ export class CategoryService {
 
   async getCategory(): Promise<Category[]> {
     try {
-      const allCategories = await this.categoryRepository.find()
+      const allCategories = await this.categoryRepository.find({select:['id', 'name', 'description']})
       return allCategories;
     } catch (error) {
       throw new BadRequestException(
