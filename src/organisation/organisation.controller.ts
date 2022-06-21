@@ -20,7 +20,7 @@ export class OrganisationController {
   constructor(private readonly orgService: OrganisationService) {}
 
   @ApiOperation({ summary: 'Create an organisations' })
-  @Post('/create/:profileId')
+  @Post('/:profileId/create')
   async createNewOrganisation(
     @Body() organisationDto: OrganisationDto,
     @Param('profileId') profileId: string,
@@ -71,7 +71,7 @@ export class OrganisationController {
     @Param('id') id: string,
     @Param('profileId') profileId: string,
   ) {
-    const updatedOrganisation = this.orgService.updateOrganisation(
+    const updatedOrganisation = await this.orgService.updateOrganisation(
       id,
       profileId,
       updateOrganisationDto,
@@ -85,7 +85,30 @@ export class OrganisationController {
     @Param('id') id: string,
     @Param('profileId') profileId: string,
   ) {
-    const deletedOrg = this.orgService.removeOrganisation(id, profileId);
-    return ZapiResponse.Ok(deletedOrg, 'Organisation deleted', '200');
+    const deletedOrg = await this.orgService.removeOrganisation(id, profileId);
+    return ZapiResponse.Ok(
+      deletedOrg,
+      'Organisation and organisation teammates deleted',
+      '200',
+    );
+  }
+
+  @Delete('/:profileId/deleteUser/:id/:userEmail')
+  @ApiOperation({ summary: 'Delete a user from organisation' })
+  async removeUser(
+    @Param('id') id: string,
+    @Param('profileId') profileId: string,
+    @Param('userEmail') userEmail: string,
+  ) {
+    const deletedUser = await this.orgService.removeUser(
+      id,
+      profileId,
+      userEmail,
+    );
+    return ZapiResponse.Ok(
+      deletedUser,
+      'User deleted from the organisation team',
+      '200',
+    );
   }
 }
