@@ -40,13 +40,7 @@ export class EndpointsService {
       return savedEndpoint;
     } catch (error) {
       throw new BadRequestException(
-        ZapiResponse.BadRequest(
-          'Internal Server error',
-          error instanceof Error
-            ? `${error.message}`
-            : 'An unknown error occured',
-          '500',
-        ),
+        ZapiResponse.BadRequest('Internal Server error', error.message, '500'),
       );
     }
   }

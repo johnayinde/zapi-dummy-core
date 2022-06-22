@@ -38,13 +38,7 @@ export class ApiService {
       return await this.apiRepository.save(newApi);
     } catch (error) {
       throw new BadRequestException(
-        ZapiResponse.BadRequest(
-          'Internal Server error',
-          error instanceof Error
-            ? `${error.message}`
-            : 'An unknown error occured',
-          '500',
-        ),
+        ZapiResponse.BadRequest('Internal Server error', error.message, '500'),
       );
     }
   }
@@ -58,13 +52,7 @@ export class ApiService {
       return await this.apiRepository.find();
     } catch (error) {
       throw new BadRequestException(
-        ZapiResponse.BadRequest(
-          'Server error',
-          error instanceof Error
-            ? `${error.message}`
-            : 'An unknown error occured',
-          '500',
-        ),
+        ZapiResponse.BadRequest('Internal Server error', error.message, '500'),
       );
     }
   }
@@ -82,13 +70,7 @@ export class ApiService {
       });
     } catch (error) {
       throw new BadRequestException(
-        ZapiResponse.BadRequest(
-          'Internal Server error',
-          error instanceof Error
-            ? `${error.message}`
-            : 'An unknown error occured',
-          '500',
-        ),
+        ZapiResponse.BadRequest('Internal Server error', error.message, '500'),
       );
     }
   }
@@ -113,13 +95,7 @@ export class ApiService {
       return api;
     } catch (error) {
       throw new BadRequestException(
-        ZapiResponse.BadRequest(
-          'Internal Server error',
-          error instanceof Error
-            ? `${error.message}`
-            : 'An unknown error occured',
-          '500',
-        ),
+        ZapiResponse.BadRequest('Internal Server error', error.message, '500'),
       );
     }
   }
@@ -157,13 +133,7 @@ export class ApiService {
       }
     } catch (error) {
       throw new BadRequestException(
-        ZapiResponse.BadRequest(
-          'Internal Server error',
-          error instanceof Error
-            ? `${error.message}`
-            : 'An unknown error occured',
-          '500',
-        ),
+        ZapiResponse.BadRequest('Internal Server error', error.message, '500'),
       );
     }
   }
@@ -192,13 +162,7 @@ export class ApiService {
       );
     } catch (error) {
       throw new BadRequestException(
-        ZapiResponse.BadRequest(
-          'Internal Server error',
-          error instanceof Error
-            ? `${error.message}`
-            : 'An unknown error occured',
-          '500',
-        ),
+        ZapiResponse.BadRequest('Internal Server error', error.message, '500'),
       );
     }
   }
@@ -229,13 +193,7 @@ export class ApiService {
       }
     } catch (error) {
       throw new BadRequestException(
-        ZapiResponse.BadRequest(
-          'Internal Server error',
-          error instanceof Error
-            ? `${error.message}`
-            : 'An unknown error occured',
-          '500',
-        ),
+        ZapiResponse.BadRequest('Internal Server error', error.message, '500'),
       );
     }
   }
