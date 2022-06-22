@@ -8,6 +8,7 @@ import { configConstant } from './common/constants/config.constant';
 import { ApiModule } from './api/api.module';
 import { PricingModule } from './pricing/pricing.module';
 import { OrganisationModule } from './organisation/organisation.module';
+import { EndpointsModule } from './endpoints/endpoints.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { OrganisationModule } from './organisation/organisation.module';
     PricingModule,
     CategoriesModule,
     OrganisationModule,
+    EndpointsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
