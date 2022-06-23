@@ -93,7 +93,7 @@ export class OrganisationService {
         throw new BadRequestException(
           ZapiResponse.BadRequest(
             'Unauthorized',
-            'This User is already registered in this organisation',
+            'This user is already registered in this organisation',
             '401',
           ),
         );
