@@ -3,10 +3,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { CategoriesModule } from './categories/categories.module';
 import { configConstant } from './common/constants/config.constant';
 import { ApiModule } from './api/api.module';
 import { PricingModule } from './pricing/pricing.module';
 import { OrganisationModule } from './organisation/organisation.module';
+import { EndpointsModule } from './endpoints/endpoints.module';
 
 @Module({
   imports: [
@@ -30,7 +32,9 @@ import { OrganisationModule } from './organisation/organisation.module';
     }),
     ApiModule,
     PricingModule,
+    CategoriesModule,
     OrganisationModule,
+    EndpointsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
