@@ -1,18 +1,9 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Put,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { OrganisationDto } from './dto/create-org.dto';
 import { OrganisationService } from './organisation.service';
 import { OrgUserDto } from './dto/create-user.dto';
 import { ZapiResponse } from 'src/common/helpers/response';
-import { UpdateOrganisationDto } from './dto/update-org.dto';
 
 @ApiTags('Organisation')
 @Controller('organisation')
@@ -60,23 +51,8 @@ export class OrganisationController {
   @Get('/users/:id')
   @ApiOperation({ summary: 'Get users of organisation' })
   async getOrgUsers(@Param('id') id: string) {
-    const users = await this.orgService.findUsersByOrg(id);
+    const users = await this.orgService.findUsersByOrgId(id);
     return ZapiResponse.Ok(users, 'All users of an organisation', '200');
-  }
-
-  @Put('/:profileId/update/:id')
-  @ApiOperation({ summary: 'Update an existing organisation' })
-  async updateOrganisation(
-    @Body() updateOrganisationDto: UpdateOrganisationDto,
-    @Param('id') id: string,
-    @Param('profileId') profileId: string,
-  ) {
-    const updatedOrganisation = await this.orgService.updateOrganisation(
-      id,
-      profileId,
-      updateOrganisationDto,
-    );
-    return ZapiResponse.Ok(updatedOrganisation, 'Organisation updated', '200');
   }
 
   @Delete('/:profileId/delete/:id')
@@ -89,25 +65,6 @@ export class OrganisationController {
     return ZapiResponse.Ok(
       deletedOrg,
       'Organisation and organisation teammates deleted',
-      '200',
-    );
-  }
-
-  @Delete('/:profileId/deleteUser/:id/:userEmail')
-  @ApiOperation({ summary: 'Delete a user from organisation' })
-  async removeUser(
-    @Param('id') id: string,
-    @Param('profileId') profileId: string,
-    @Param('userEmail') userEmail: string,
-  ) {
-    const deletedUser = await this.orgService.removeUser(
-      id,
-      profileId,
-      userEmail,
-    );
-    return ZapiResponse.Ok(
-      deletedUser,
-      'User deleted from the organisation team',
       '200',
     );
   }
