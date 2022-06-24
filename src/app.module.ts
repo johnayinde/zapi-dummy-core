@@ -9,6 +9,7 @@ import { ApiModule } from './api/api.module';
 import { PricingModule } from './pricing/pricing.module';
 import { OrganisationModule } from './organisation/organisation.module';
 import { EndpointsModule } from './endpoints/endpoints.module';
+import { ProfileModule } from './profile/profile.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { EndpointsModule } from './endpoints/endpoints.module';
     CategoriesModule,
     OrganisationModule,
     EndpointsModule,
+    ProfileModule,
   ],
   controllers: [AppController],
   providers: [AppService],
