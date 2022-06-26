@@ -6,6 +6,7 @@ import { Status } from '../common/enums/apiVerification.enum';
 import { Profile } from './profile.entity';
 import { Category } from './category.entity';
 import { Type } from '../common/enums/apiType.enum';
+import { Subscription } from './subscription.entity';
 @Entity()
 export class Api extends SharedEntity {
   @Column({ unique: true })
@@ -17,8 +18,8 @@ export class Api extends SharedEntity {
   @Column({ nullable: true })
   base_url: string;
 
-  @Column('text', { array: true, nullable: true, default: [] })
-  subscribers: string[];
+  @Column('text', { array: true, default: [] })
+  subscriptions: string[];
 
   @Column({ default: 0 })
   popularity: number;
@@ -71,11 +72,17 @@ export class Api extends SharedEntity {
   @OneToMany(() => PriceGroup, (priceGroup) => priceGroup.api)
   priceGroup: PriceGroup[];
 
-  @ManyToOne(() => Profile, (profile) => profile.apis)
+  @ManyToOne(() => Profile, (profile) => profile.id)
   @JoinColumn({ name: 'profileId' })
   profile: Profile;
 
   @ManyToOne(() => Category, (category) => category.api)
   @JoinColumn({ name: 'categoryId' })
   category: Category;
+
+  @OneToMany(() => Subscription, (subscription) => subscription.api, {
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn({ name: 'subscriptions' })
+  subscription: Subscription[];
 }

@@ -9,6 +9,7 @@ import { ApiModule } from './api/api.module';
 import { PricingModule } from './pricing/pricing.module';
 import { OrganisationModule } from './organisation/organisation.module';
 import { EndpointsModule } from './endpoints/endpoints.module';
+import { SubscriptionModule } from './subscription/subscription.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { EndpointsModule } from './endpoints/endpoints.module';
     CategoriesModule,
     OrganisationModule,
     EndpointsModule,
+    SubscriptionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
