@@ -1,5 +1,12 @@
 import { SharedEntity } from '../common/model/sharedEntity';
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+} from 'typeorm';
 import { Discussion } from './discussion.entity';
 import { PriceGroup } from './price-group.entity';
 import { Status } from '../common/enums/apiVerification.enum';
@@ -17,9 +24,6 @@ export class Api extends SharedEntity {
 
   @Column({ nullable: true })
   base_url: string;
-
-  @Column('text', { array: true, default: [] })
-  subscriptions: string[];
 
   @Column({ default: 0 })
   popularity: number;
@@ -72,7 +76,7 @@ export class Api extends SharedEntity {
   @OneToMany(() => PriceGroup, (priceGroup) => priceGroup.api)
   priceGroup: PriceGroup[];
 
-  @ManyToOne(() => Profile, (profile) => profile.id)
+  @ManyToOne(() => Profile, (profile) => profile.id, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'profileId' })
   profile: Profile;
 
@@ -80,9 +84,9 @@ export class Api extends SharedEntity {
   @JoinColumn({ name: 'categoryId' })
   category: Category;
 
-  @OneToMany(() => Subscription, (subscription) => subscription.api, {
+  @OneToOne(() => Subscription, (subscription) => subscription.api, {
     onDelete: 'SET NULL',
   })
-  @JoinColumn({ name: 'subscriptions' })
-  subscription: Subscription[];
+  @JoinColumn()
+  subscription: Subscription;
 }

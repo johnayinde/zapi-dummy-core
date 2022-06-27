@@ -21,33 +21,44 @@ export class SubscriptionService {
   ) {}
 
   /**
-   * It creates a subscription between a profile and an API, and returns the tokens for the subscription
+   * It takes in a createSubscriptionDto object, checks if the user is already subscribed to the api, if
+   * not, it creates a subscription, saves it, updates the user's subscriptions array, and returns the
+   * tokens.
    * @param {createSubscriptionDto} createSubDto - createSubscriptionDto
-   * @returns The tokens are being returned.
+   * @returns The subscription object
    */
+
   async subscribe(createSubDto: createSubscriptionDto): Promise<Tokens> {
     const { profileId, apiId } = createSubDto;
     try {
       const api = await this.apiRepository.findOne(apiId);
       const profile = await this.profileRepository.findOne(profileId);
+      const subscribed = profile.subscriptions.includes(apiId);
 
-      if (api && profile) {
-        const subscription = this.subRepository.create(createSubDto);
-        const savedSubscription = await this.subRepository.save(subscription);
-
-        await this.profileRepository.update(profile.id, {
-          subscriptions: [...profile.subscriptions, savedSubscription.id],
-        });
-
-        await this.apiRepository.update(api.id, {
-          subscriptions: [...api.subscriptions, profile.id],
-        });
-
-        return await this.getTokens(
-          createSubDto.apiId,
-          savedSubscription.profileId,
+      if (subscribed) {
+        throw new BadRequestException(
+          ZapiResponse.BadRequest(
+            'Existing Suscription',
+            'This user is already suscribed to this api',
+            '403',
+          ),
         );
+      } else {
+        if (api && profile) {
+          const subscription = this.subRepository.create(createSubDto);
+          const savedSubscription = await this.subRepository.save(subscription);
+
+          await this.profileRepository.update(profile.id, {
+            subscriptions: [...profile.subscriptions, api.id],
+          });
+
+          return await this.getTokens(
+            savedSubscription.apiId,
+            savedSubscription.profileId,
+          );
+        }
       }
+
       throw new NotFoundException(
         ZapiResponse.NotFoundRequest(
           'Not Found',

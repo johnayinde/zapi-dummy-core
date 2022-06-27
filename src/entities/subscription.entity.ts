@@ -1,5 +1,5 @@
 import { SharedEntity } from '../common/model/sharedEntity';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 import { Profile } from './profile.entity';
 import { Api } from './api.entity';
 
@@ -11,7 +11,7 @@ export class Subscription extends SharedEntity {
   @Column()
   profileId: string;
 
-  @ManyToOne(() => Api, (api) => api.subscription, {
+  @OneToOne(() => Api, (api) => api.subscription, {
     onDelete: 'SET NULL',
   })
   @JoinColumn({ name: 'apiId' })

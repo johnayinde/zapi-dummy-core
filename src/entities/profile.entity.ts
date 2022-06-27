@@ -12,7 +12,7 @@ export class Profile extends SharedEntity {
   @Column()
   user_id: string;
 
-  @Column('text', { array: true, default: [] })
+  @Column('text', { array: true, nullable: true, default: [] })
   subscriptions: string[];
 
   @Column({ nullable: true })
