@@ -24,6 +24,6 @@ async function bootstrap() {
       transform: true,
     }),
   );
-  await app.listen(Number(process.env.NODE_PORT) || 3001);
+  await app.listen(Number(process.env.NODE_PORT) || 3000);
 }
 bootstrap();

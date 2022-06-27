@@ -10,6 +10,7 @@ import { PricingModule } from './pricing/pricing.module';
 import { OrganisationModule } from './organisation/organisation.module';
 import { EndpointsModule } from './endpoints/endpoints.module';
 import { SubscriptionModule } from './subscription/subscription.module';
+import { ProfileModule } from './profile/profile.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { SubscriptionModule } from './subscription/subscription.module';
     OrganisationModule,
     EndpointsModule,
     SubscriptionModule,
+    ProfileModule,
   ],
   controllers: [AppController],
   providers: [AppService],
