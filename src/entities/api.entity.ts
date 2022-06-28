@@ -12,7 +12,7 @@ import { PriceGroup } from './price-group.entity';
 import { Status } from '../common/enums/apiVerification.enum';
 import { Profile } from './profile.entity';
 import { Category } from './category.entity';
-import { Type } from '../common/enums/apiType.enum';
+import { Visibility } from '../common/enums/visibility.enum';
 import { Subscription } from './subscription.entity';
 @Entity()
 export class Api extends SharedEntity {
@@ -22,7 +22,7 @@ export class Api extends SharedEntity {
   @Column()
   description: string;
 
-  @Column({ nullable: true })
+  @Column()
   base_url: string;
 
   @Column({ default: 0 })
@@ -40,10 +40,10 @@ export class Api extends SharedEntity {
 
   @Column({
     type: 'enum',
-    enum: Type,
-    default: Type.Private,
+    enum: Visibility,
+    default: Visibility.Private,
   })
-  type: Type;
+  visibility: Visibility;
 
   @Column({ default: 0 })
   rating: number;

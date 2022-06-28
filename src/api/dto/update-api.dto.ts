@@ -1,6 +1,6 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'src/common/enums/apiType.enum';
+import { Visibility } from 'src/common/enums/visibility.enum';
 import { CreateApiDto } from './create-api.dto';
 
 export class UpdateApiDto extends PartialType(CreateApiDto) {
@@ -17,5 +17,5 @@ export class UpdateApiDto extends PartialType(CreateApiDto) {
   about: string;
 
   @ApiPropertyOptional()
-  type: Type;
+  visibility: Visibility;
 }
