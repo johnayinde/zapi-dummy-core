@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { OrganisationDto } from './dto/create-org.dto';
 import { OrganisationService } from './organisation.service';
@@ -11,7 +11,7 @@ export class OrganisationController {
   constructor(private readonly orgService: OrganisationService) {}
 
   @ApiOperation({ summary: 'Create an organisations' })
-  @Post('/create/:profileId')
+  @Post('/:profileId/create')
   async createNewOrganisation(
     @Body() organisationDto: OrganisationDto,
     @Param('profileId') profileId: string,
@@ -34,6 +34,13 @@ export class OrganisationController {
     return ZapiResponse.Ok(user, 'User added to organisation', '201');
   }
 
+  @Get()
+  @ApiOperation({ summary: 'Get all organisations' })
+  async getAllOrganisation() {
+    const allOrgs = await this.orgService.getAllOrganisation();
+    return ZapiResponse.Ok(allOrgs, 'All organisation', '201');
+  }
+
   @Get('/:id')
   @ApiOperation({ summary: 'Get one organisations' })
   async getOrganisationById(@Param('id') id: string) {
@@ -44,7 +51,21 @@ export class OrganisationController {
   @Get('/users/:id')
   @ApiOperation({ summary: 'Get users of organisation' })
   async getOrgUsers(@Param('id') id: string) {
-    const users = await this.orgService.findUsersByOrg(id);
+    const users = await this.orgService.findUsersByOrgId(id);
     return ZapiResponse.Ok(users, 'All users of an organisation', '200');
+  }
+
+  @Delete('/:profileId/delete/:id')
+  @ApiOperation({ summary: 'Delete an existing organisation and its users' })
+  async removeOrganisation(
+    @Param('id') id: string,
+    @Param('profileId') profileId: string,
+  ) {
+    const deletedOrg = await this.orgService.removeOrganisation(id, profileId);
+    return ZapiResponse.Ok(
+      deletedOrg,
+      'Organisation and organisation teammates deleted',
+      '200',
+    );
   }
 }
