@@ -1,12 +1,5 @@
 import { SharedEntity } from '../common/model/sharedEntity';
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-  OneToOne,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { Discussion } from './discussion.entity';
 import { PriceGroup } from './price-group.entity';
 import { Status } from '../common/enums/apiVerification.enum';
@@ -30,6 +23,9 @@ export class Api extends SharedEntity {
 
   @Column({ nullable: true })
   about: string;
+
+  @Column('text', { array: true, nullable: true, default: [] })
+  subscriptions: string[];
 
   @Column({
     type: 'enum',
@@ -84,9 +80,9 @@ export class Api extends SharedEntity {
   @JoinColumn({ name: 'categoryId' })
   category: Category;
 
-  @OneToOne(() => Subscription, (subscription) => subscription.api, {
+  @OneToMany(() => Subscription, (subscription) => subscription.api, {
     onDelete: 'SET NULL',
   })
-  @JoinColumn()
-  subscription: Subscription;
+  @JoinColumn({ name: 'subscriptions' })
+  subscription: Subscription[];
 }
