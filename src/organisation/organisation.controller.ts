@@ -1,9 +1,19 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { OrganisationDto } from './dto/create-org.dto';
 import { OrganisationService } from './organisation.service';
 import { OrgUserDto } from './dto/create-user.dto';
 import { ZapiResponse } from 'src/common/helpers/response';
+import { UpdateOrganisationDto } from './dto/update-org.dto';
+import { DeleteUserDto } from './dto/delete-user.dto';
 
 @ApiTags('Organisation')
 @Controller('organisation')
@@ -64,8 +74,42 @@ export class OrganisationController {
     const deletedOrg = await this.orgService.removeOrganisation(id, profileId);
     return ZapiResponse.Ok(
       deletedOrg,
-      'Organisation and organisation teammates deleted',
+      'Organisation and teammates deleted',
       '200',
     );
+  }
+
+  @Delete('/:profileId/deleteUser/:id/')
+  @ApiOperation({ summary: 'Delete a user from organisation' })
+  async removeUser(
+    @Param('id') id: string,
+    @Param('profileId') profileId: string,
+    @Body() userEmail: DeleteUserDto,
+  ) {
+    const deletedUser = await this.orgService.removeUser(
+      id,
+      profileId,
+      userEmail,
+    );
+    return ZapiResponse.Ok(
+      deletedUser,
+      'User deleted from the organisation team',
+      '200',
+    );
+  }
+
+  @Put('/:profileId/update/:id')
+  @ApiOperation({ summary: 'Update an existing organisation' })
+  async updateOrganisation(
+    @Body() updateOrganisationDto: UpdateOrganisationDto,
+    @Param('id') id: string,
+    @Param('profileId') profileId: string,
+  ) {
+    const updatedOrganisation = await this.orgService.updateOrganisation(
+      id,
+      profileId,
+      updateOrganisationDto,
+    );
+    return ZapiResponse.Ok(updatedOrganisation, 'Organisation updated', '200');
   }
 }
