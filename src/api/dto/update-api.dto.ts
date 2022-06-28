@@ -17,5 +17,5 @@ export class UpdateApiDto extends PartialType(CreateApiDto) {
   about: string;
 
   @ApiPropertyOptional()
-  type: Visibility;
+  visibility: Visibility;
 }
