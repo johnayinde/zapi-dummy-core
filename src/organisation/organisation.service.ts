@@ -46,34 +46,22 @@ export class OrganisationService {
     }
 
     const newOrg = this.orgRepo.create({
-      name: orgDto.name,
-      number_of_seats: orgDto.number_of_seats,
-      number_of_employees: orgDto.number_of_employees,
+      ...orgDto,
       price_per_month: 0,
       profile: profile,
       profileId: profile.id,
     });
 
     const organisationEntry = await this.orgRepo.save(newOrg);
-    if (organisationEntry) {
-      const orgUsers = await this.addUserToOrg(
-        organisationEntry.id,
-        profile.id,
-        {
-          email: profile.email,
-          role: OrgRole.ADMIN,
-        },
-      );
-      return { ...organisationEntry, AdminProfileOrgId: orgUsers.id };
-    } else {
-      throw new BadRequestException(
-        ZapiResponse.BadRequest(
-          'Server Error',
-          "organisation can't be saved",
-          '500',
-        ),
-      );
-    }
+    const orgUsers = await this.addUserToOrg(
+      organisationEntry.id,
+      profile.id,
+      {
+        email: profile.email,
+        role: OrgRole.ADMIN,
+      },
+    );
+    return { ...organisationEntry, AdminProfileOrgId: orgUsers.id };
   }
 
   /**
@@ -133,7 +121,7 @@ export class OrganisationService {
   }
 
   /**
-   * It find profile by Id,
+   * It find profile by Id
    * @Param {string} id - the profile id
    * @returns a promise of the organisation, throws an error if id does not exist
    * */
