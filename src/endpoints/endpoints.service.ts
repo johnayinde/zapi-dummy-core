@@ -1,12 +1,15 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { ZapiResponse } from 'src/common/helpers/response';
-import { EndpointRepository } from 'src/database/repository/endpoints.repository';
 import { Endpoint } from 'src/entities/endpoint.entity';
+import { Repository } from 'typeorm';
 import { CreateEndpointDto } from './dto/create-endpoint.dto';
 
 @Injectable()
 export class EndpointsService {
-  constructor(private readonly endpointRepository: EndpointRepository) {}
+  constructor(
+    @InjectRepository(Endpoint)
+    private readonly endpointRepository: Repository<Endpoint>) {}
 
   /**
    * It creates an endpoint and saves it to the database
