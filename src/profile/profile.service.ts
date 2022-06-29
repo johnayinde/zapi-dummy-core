@@ -3,12 +3,15 @@ import { Profile } from '../entities/profile.entity';
 import { ProfileRepository } from '../database/repository/profile.repository';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { ZapiResponse } from '../common/helpers/response';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 
 @Injectable()
 export class ProfileService {
     constructor(
-        private profileRepo: ProfileRepository 
+        @InjectRepository(Profile)
+        private profileRepo: Repository<Profile> 
     ){}
 
     async create (profileDto: CreateProfileDto): Promise<Profile>{
@@ -32,7 +35,7 @@ export class ProfileService {
     }
 
     async getOne(profileID: string): Promise<Profile>{
-        const profile = await this.profileRepo.findOne(profileID)
+        const profile = await this.profileRepo.findOne({where : { id: profileID}})
         if(!profile){
             throw new NotFoundException(
                 ZapiResponse.NotFoundRequest('Not Found', 'Profile does not exist', '404')
