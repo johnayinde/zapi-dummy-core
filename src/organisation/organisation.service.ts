@@ -5,21 +5,23 @@ import {
 } from '@nestjs/common';
 import { OrgRole } from 'src/common/enums/orgRole.enum';
 import { ZapiResponse } from 'src/common/helpers/response';
-import { OrganisationRepository } from 'src/database/repository/organisation.repository';
-import { ProfileRepository } from 'src/database/repository/profile.repository';
-import { ProfileOrgRepository } from 'src/database/repository/profileOrg.repository';
 import { Organisation } from 'src/entities/organisation.entity';
 import { OrganisationDto } from './dto/create-org.dto';
 import { OrgUserDto } from './dto/create-user.dto';
 import { Profile } from 'src/entities/profile.entity';
 import { ProfileOrg } from 'src/entities/profile-org.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class OrganisationService {
   constructor(
-    private readonly orgRepo: OrganisationRepository,
-    private readonly profileOrgRepo: ProfileOrgRepository,
-    private readonly profileRepo: ProfileRepository,
+    @InjectRepository(Organisation)
+    private readonly orgRepo: Repository<Organisation>,
+    @InjectRepository(ProfileOrg)
+    private readonly profileOrgRepo: Repository<ProfileOrg>,
+    @InjectRepository(Profile)
+    private readonly profileRepo: Repository<Profile>,
   ) {}
 
   /**
@@ -120,7 +122,7 @@ export class OrganisationService {
    * */
   async findOrganisationById(id: string): Promise<Organisation> {
     try {
-      const org = await this.orgRepo.findOne(id);
+      const org = await this.orgRepo.findOne({where : { id }});
       if (!org) {
         throw new NotFoundException(
           ZapiResponse.NotFoundRequest(
@@ -145,7 +147,7 @@ export class OrganisationService {
    * */
   async findProfileById(profileId: string): Promise<Profile> {
     try {
-      const profile = await this.profileRepo.findOne(profileId);
+      const profile = await this.profileRepo.findOne({where : { id: profileId}});
       if (!profile) {
         throw new NotFoundException(
           ZapiResponse.NotFoundRequest(
