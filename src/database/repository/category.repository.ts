@@ -1,5 +1,6 @@
 import { Category } from 'src/entities/category.entity';
-import { EntityRepository, Repository } from 'typeorm';
+import { DataSource } from 'typeorm';
 
-@EntityRepository(Category)
-export class CategoryRepository extends Repository<Category> {}
+let dataSource: DataSource;
+export const CategoryRepository = dataSource.getRepository(Category).extend({})
+

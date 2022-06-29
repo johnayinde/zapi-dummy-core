@@ -21,8 +21,7 @@ export class SubscriptionService {
   ) {}
 
   /**
-   * It takes in a createSubscriptionDto object, checks if the user is already subscribed to the api, if
-   * not, it creates a subscription, saves it, updates the user's subscriptions array, and returns the
+   * It takes in a createSubscriptionDto object, checks if the user is already subscribed to the api, if not, it creates a subscription, saves it, updates the user's and api's subscriptions array, and returns the
    * tokens.
    * @param {createSubscriptionDto} createSubDto - createSubscriptionDto
    * @returns The subscription object
@@ -38,8 +37,8 @@ export class SubscriptionService {
       if (subscribed) {
         throw new BadRequestException(
           ZapiResponse.BadRequest(
-            'Existing Suscription',
-            'This user is already suscribed to this api',
+            'Existing Subscription',
+            'This user is already subscribed to this api',
             '403',
           ),
         );
@@ -50,6 +49,10 @@ export class SubscriptionService {
 
           await this.profileRepository.update(profile.id, {
             subscriptions: [...profile.subscriptions, api.id],
+          });
+
+          await this.apiRepository.update(api.id, {
+            subscriptions: [...api.subscriptions, profile.id],
           });
 
           return await this.getTokens(

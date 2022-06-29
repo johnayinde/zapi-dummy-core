@@ -5,12 +5,16 @@ import { PricingDto } from './dto/create-pricing.dto';
 import { ZapiResponse } from '../common/helpers/response';
 import { PriceGroup } from '../entities/price-group.entity';
 import { PriceGroupRepository } from '../database/repository/price-group.repository';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class PricingService {
     constructor(
-        private readonly pricingRepository: PricingRepository,
-        private readonly priceGroupRepository: PriceGroupRepository
+        @InjectRepository(Pricing)
+        private readonly pricingRepository: Repository<Pricing>,
+        @InjectRepository(PriceGroup)
+        private readonly priceGroupRepository: Repository<PriceGroup>
     ) {}
     
     /**
