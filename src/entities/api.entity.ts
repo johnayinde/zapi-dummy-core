@@ -5,7 +5,8 @@ import { PriceGroup } from './price-group.entity';
 import { Status } from '../common/enums/apiVerification.enum';
 import { Profile } from './profile.entity';
 import { Category } from './category.entity';
-import { Type } from '../common/enums/apiType.enum';
+import { Visibility } from '../common/enums/visibility.enum';
+import { Subscription } from './subscription.entity';
 @Entity()
 export class Api extends SharedEntity {
   @Column({ unique: true })
@@ -14,17 +15,17 @@ export class Api extends SharedEntity {
   @Column()
   description: string;
 
-  @Column({ nullable: true })
+  @Column()
   base_url: string;
-
-  @Column('text', { array: true, nullable: true, default: [] })
-  subscribers: string[];
 
   @Column({ default: 0 })
   popularity: number;
 
   @Column({ nullable: true })
   about: string;
+
+  @Column('text', { array: true, nullable: true, default: [] })
+  subscriptions: string[];
 
   @Column({
     type: 'enum',
@@ -35,10 +36,10 @@ export class Api extends SharedEntity {
 
   @Column({
     type: 'enum',
-    enum: Type,
-    default: Type.Private,
+    enum: Visibility,
+    default: Visibility.Private,
   })
-  type: Type;
+  visibility: Visibility;
 
   @Column({ default: 0 })
   rating: number;
@@ -54,6 +55,9 @@ export class Api extends SharedEntity {
 
   @Column()
   profileId: string;
+
+  @Column()
+  testColumn: string;
 
   @Column({ nullable: true })
   tutorialsId: string;
@@ -71,11 +75,17 @@ export class Api extends SharedEntity {
   @OneToMany(() => PriceGroup, (priceGroup) => priceGroup.api)
   priceGroup: PriceGroup[];
 
-  @ManyToOne(() => Profile, (profile) => profile.apis)
+  @ManyToOne(() => Profile, (profile) => profile.id, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'profileId' })
   profile: Profile;
 
   @ManyToOne(() => Category, (category) => category.api)
   @JoinColumn({ name: 'categoryId' })
   category: Category;
+
+  @OneToMany(() => Subscription, (subscription) => subscription.api, {
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn({ name: 'subscriptions' })
+  subscription: Subscription[];
 }

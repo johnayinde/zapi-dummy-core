@@ -3,16 +3,19 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { ZapiResponse } from 'src/common/helpers/response';
-import { APIRepository } from 'src/database/repository/api.repository';
-import { Api } from 'src/entities/api.entity';
+import { Api } from '../entities/api.entity';
+import { Repository } from 'typeorm';
 import { CreateApiDto } from './dto/create-api.dto';
 import { UpdateApiDto } from './dto/update-api.dto';
 
 /* The ApiService class is a service that uses the APiRepository class to do crud operation */
 @Injectable()
 export class ApiService {
-  constructor(private readonly apiRepository: APIRepository) {}
+  constructor(
+    @InjectRepository(Api)
+    private readonly apiRepository: Repository<Api>) {}
 
   /* Checking if the api name already exists in the database. */
   async create(profileId: string, createApiDto: CreateApiDto): Promise<Api> {
@@ -113,7 +116,7 @@ export class ApiService {
     updateApiDto: UpdateApiDto,
   ): Promise<Api> {
     try {
-      const api = await this.apiRepository.findOne(apiId);
+      const api = await this.apiRepository.findOne({where : { id: apiId}});
       if (api) {
         /* Checking if the user is the owner of the api. */
         const verified = await this.verify(apiId, profileId);
@@ -124,7 +127,7 @@ export class ApiService {
         }
 
         await this.apiRepository.update(apiId, updateApiDto);
-        const updatedApi = await this.apiRepository.findOne(apiId);
+        const updatedApi = await this.apiRepository.findOne({where : { id: apiId}});
         if (updatedApi) {
           return updatedApi;
         }
@@ -153,7 +156,7 @@ export class ApiService {
           ZapiResponse.BadRequest('Forbidden', 'Unauthorized action', '403'),
         );
       }
-      const api = await this.apiRepository.findOne(id);
+      const api = await this.apiRepository.findOne({where : { id }});
       if (api) {
         return await this.apiRepository.remove(api);
       }
@@ -176,9 +179,7 @@ export class ApiService {
    */
   async verify(apiId: string, profileId: string): Promise<boolean> {
     try {
-      const api = await this.apiRepository.findOne({
-        id: apiId,
-      });
+      const api = await this.apiRepository.findOne({where : { id: apiId}});
       if (!api) {
         throw new NotFoundException(
           ZapiResponse.NotFoundRequest(

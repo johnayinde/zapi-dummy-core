@@ -5,12 +5,15 @@ import {
 } from '@nestjs/common';
 import { ZapiResponse } from '../common/helpers/response';
 import { Category } from '../entities/category.entity';
-import { CategoryRepository } from '../database/repository/category.repository';
 import { CreateCategoriesDto } from './dto/categories.dto';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class CategoryService {
-  constructor(private readonly categoryRepository: CategoryRepository) {}
+  constructor(
+    @InjectRepository(Category)
+    private readonly categoryRepository: Repository<Category>) {}
 
   async createCategory(payload: CreateCategoriesDto): Promise<Category> {
     try {
@@ -53,7 +56,7 @@ export class CategoryService {
 
   async deleteCategogry(id: string): Promise<string> {
     try {
-      const category = await this.categoryRepository.findOne(id);
+      const category = await this.categoryRepository.findOne({where : { id}});
       if (category) {
          await this.categoryRepository.remove(category);
          return  `${category.name} category successfully deleted`
