@@ -2,7 +2,7 @@ import { Controller, Post, Body, Param } from '@nestjs/common';
 import { EndpointsService } from './endpoints.service';
 import { CreateEndpointDto } from './dto/create-endpoint.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Endpoint } from 'src/entities/endpoint.entity';
+import { Endpoint } from '../entities/endpoint.entity';
 import { Ok, ZapiResponse } from 'src/common/helpers/response';
 
 @ApiTags('Endpoints')

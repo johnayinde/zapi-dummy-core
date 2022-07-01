@@ -4,19 +4,24 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
 import { ZapiResponse } from 'src/common/helpers/response';
 import { Tokens } from 'src/common/types';
-import { APIRepository } from 'src/database/repository/api.repository';
-import { ProfileRepository } from 'src/database/repository/profile.repository';
-import { SubscriptionRepository } from 'src/database/repository/subscription.repository';
+import { Api } from 'src/entities/api.entity';
+import { Profile } from 'src/entities/profile.entity';
+import { Subscription } from 'src/entities/subscription.entity';
+import { Repository } from 'typeorm';
 import { createSubscriptionDto } from './dto/create-subscription.dto';
 
 @Injectable()
 export class SubscriptionService {
   constructor(
-    private readonly subRepository: SubscriptionRepository,
-    private readonly apiRepository: APIRepository,
-    private readonly profileRepository: ProfileRepository,
+    @InjectRepository(Subscription)
+    private readonly subRepository: Repository<Subscription>,
+    @InjectRepository(Api)
+    private readonly apiRepository: Repository<Api>,
+    @InjectRepository(Profile)
+    private readonly profileRepository: Repository<Profile>,
     private jwtService: JwtService,
   ) {}
 
@@ -30,8 +35,8 @@ export class SubscriptionService {
   async subscribe(createSubDto: createSubscriptionDto): Promise<Tokens> {
     const { profileId, apiId } = createSubDto;
     try {
-      const api = await this.apiRepository.findOne(apiId);
-      const profile = await this.profileRepository.findOne(profileId);
+      const api = await this.apiRepository.findOne({where : { id: apiId}});
+      const profile = await this.profileRepository.findOne({where : { id: profileId}});
       const subscribed = profile.subscriptions.includes(apiId);
 
       if (subscribed) {
