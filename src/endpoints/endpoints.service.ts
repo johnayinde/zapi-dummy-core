@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ZapiResponse } from 'src/common/helpers/response';
-import { Endpoint } from 'src/entities/endpoint.entity';
+import { Endpoint } from '../entities/endpoint.entity';
 import { Repository } from 'typeorm';
 import { CreateEndpointDto } from './dto/create-endpoint.dto';
 
