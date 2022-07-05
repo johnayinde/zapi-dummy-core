@@ -9,7 +9,8 @@ import { CreateEndpointDto } from './dto/create-endpoint.dto';
 export class EndpointsService {
   constructor(
     @InjectRepository(Endpoint)
-    private readonly endpointRepository: Repository<Endpoint>) {}
+    private readonly endpointRepository: Repository<Endpoint>,
+  ) {}
 
   /**
    * It creates an endpoint and saves it to the database
@@ -34,6 +35,7 @@ export class EndpointsService {
           ),
         );
       }
+
       const newEndpoint = this.endpointRepository.create({
         ...createEndpointDto,
         apiId,
@@ -41,6 +43,35 @@ export class EndpointsService {
 
       const savedEndpoint = await this.endpointRepository.save(newEndpoint);
       return savedEndpoint;
+    } catch (error) {
+      throw new BadRequestException(
+        ZapiResponse.BadRequest('Internal Server error', error.message, '500'),
+      );
+    }
+  }
+
+  /**
+   * It returns an array of Endpoint objects from the database
+   * @returns An array of Endpoint objects.
+   */
+  async find(): Promise<Endpoint[]> {
+    try {
+      return await this.endpointRepository.find();
+    } catch (error) {
+      throw new BadRequestException(
+        ZapiResponse.BadRequest('Internal Server error', error.message, '500'),
+      );
+    }
+  }
+
+  /**
+   * Find one endpoint by id
+   * @param {string} id - string - the id of the endpoint you want to find
+   * @returns The endpoint with the id that was passed in.
+   */
+  async findOneById(id: string): Promise<Endpoint> {
+    try {
+      return await this.endpointRepository.findOne({ where: { id } });
     } catch (error) {
       throw new BadRequestException(
         ZapiResponse.BadRequest('Internal Server error', error.message, '500'),

@@ -5,7 +5,7 @@ import { Ok, ZapiResponse } from '../common/helpers/response';
 import { createSubscriptionDto } from './dto/create-subscription.dto';
 import { Tokens } from 'src/common/types';
 
-@ApiTags('subscription')
+@ApiTags('Subscription')
 @Controller('subscription')
 export class SubscriptionController {
   constructor(private readonly subscriptionService: SubscriptionService) {}

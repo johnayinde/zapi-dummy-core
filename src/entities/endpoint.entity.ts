@@ -27,6 +27,7 @@ export class Endpoint extends SharedEntity {
   @Column('text', {
     array: true,
     nullable: true,
+    default: [],
   })
   headers: object[];
 
