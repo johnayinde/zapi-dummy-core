@@ -107,8 +107,10 @@ export class SubscriptionService {
     // const userRequest = await this.httpService.axiosRef.post('request url', {data: 'something'})
     try {
       const {apiId, profileId} = this.jwtService.verify(token,{secret})
+      // both the API and the profile are fetched from the database
       const api = await this.apiRepository.findOneBy({id: apiId})
       const profile = await this.profileRepository.findOneBy({id: profileId })
+      // the api's subscriptions column is checked if it includes this current user through its profileID
       const subscribed =  api.subscriptions.includes(profile.id)
       if (subscribed){
         return ['user is subscribed to this API, in production this would return the request made by the user']
