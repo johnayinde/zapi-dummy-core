@@ -13,10 +13,21 @@ export class SubscriptionController {
   /* This is a post request to the subscription endpoint. */
   @Post('subscribe')
   @ApiOperation({ summary: 'Add a new subscription' })
-  async create(
+  async subscribe(
     @Body() createSubDto: createSubscriptionDto,
   ): Promise<Ok<Tokens>> {
     const subscription = await this.subscriptionService.subscribe(createSubDto);
     return ZapiResponse.Ok(subscription, 'Subscription Created', '201');
+  }
+
+  @Post('unsubscribe')
+  @ApiOperation({ summary: 'Unsubscription from an api' })
+  async unsubscribe(
+    @Body() createSubDto: createSubscriptionDto,
+  ): Promise<Ok<object>> {
+    const subscription = await this.subscriptionService.unsubscribe(
+      createSubDto,
+    );
+    return ZapiResponse.Ok(subscription, 'Unsubscribed Successfully', '200');
   }
 }
