@@ -10,7 +10,7 @@ import { Tokens } from 'src/common/types';
 export class SubscriptionController {
   constructor(private readonly subscriptionService: SubscriptionService) {}
 
-  /* This is a post request to the subscription endpoint. */
+  /* This is a subscribe post request to the subscription endpoint. */
   @Post('subscribe')
   @ApiOperation({ summary: 'Add a new subscription' })
   async subscribe(
@@ -20,6 +20,7 @@ export class SubscriptionController {
     return ZapiResponse.Ok(subscription, 'Subscription Created', '201');
   }
 
+  /* This is an unsubscribe post request to the subscription endpoint. */
   @Post('unsubscribe')
   @ApiOperation({ summary: 'Unsubscription from an api' })
   async unsubscribe(

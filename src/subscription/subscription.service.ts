@@ -84,6 +84,12 @@ export class SubscriptionService {
     }
   }
 
+  /**
+   * It takes in a createSubscriptionDto object, checks if the user is already subscribed to the api, and the unsubscribe the user
+   * @param {createSubscriptionDto} createSubDto - createSubscriptionDto
+   * @returns The subscription object
+   */
+
   async unsubscribe(createSubDto: createSubscriptionDto): Promise<object> {
     const { profileId, apiId } = createSubDto;
     try {
