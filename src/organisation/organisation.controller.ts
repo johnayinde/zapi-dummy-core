@@ -65,6 +65,13 @@ export class OrganisationController {
     return ZapiResponse.Ok(users, 'All users of an organisation', '200');
   }
 
+  @Get('/:profileId')
+  @ApiOperation({ summary: 'Get organisations of a profile' })
+  async getuserOrgs(@Param('profileId') profileId: string) {
+    const userOrg = await this.orgService.findOrgsByUser(profileId);
+    return ZapiResponse.Ok(userOrg, 'All organisations of a user', 200);
+  }
+
   @Delete('/:profileId/delete/:id')
   @ApiOperation({ summary: 'Delete an existing organisation and its users' })
   async removeOrganisation(

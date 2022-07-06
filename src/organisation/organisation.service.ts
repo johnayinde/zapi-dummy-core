@@ -15,7 +15,6 @@ import { DeleteUserDto } from './dto/delete-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-
 @Injectable()
 export class OrganisationService {
   constructor(
@@ -38,7 +37,7 @@ export class OrganisationService {
     const organisation = await this.orgRepo.findOne({
       where: { name: orgDto.name },
     });
-    if (organisation !== undefined) {
+    if (organisation !== null) {
       throw new BadRequestException(
         ZapiResponse.BadRequest(
           'Unauthorized',
@@ -56,14 +55,10 @@ export class OrganisationService {
     });
 
     const organisationEntry = await this.orgRepo.save(newOrg);
-    const orgUsers = await this.addUserToOrg(
-      organisationEntry.id,
-      profile.id,
-      {
-        email: profile.email,
-        role: OrgRole.ADMIN,
-      },
-    );
+    const orgUsers = await this.addUserToOrg(organisationEntry.id, profile.id, {
+      email: profile.email,
+      role: OrgRole.ADMIN,
+    });
     return { ...organisationEntry, AdminProfileOrgId: orgUsers.id };
   }
 
@@ -85,7 +80,7 @@ export class OrganisationService {
     const existingUser = await this.profileOrgRepo.findOne({
       where: { profileId: profile.id, organisationId: id },
     });
-    if (existingUser !== undefined) {
+    if (existingUser !== null) {
       throw new BadRequestException(
         ZapiResponse.BadRequest(
           'Unauthorized',
@@ -110,8 +105,8 @@ export class OrganisationService {
    * @returns a promise of the organisation, throws an error if id does not exist
    * */
   async findOrganisationById(id: string): Promise<Organisation> {
-    const org = await this.orgRepo.findOne(id);
-    if (org === undefined) {
+    const org = await this.orgRepo.findOne({ where: { id: id } });
+    if (org === null) {
       throw new NotFoundException(
         ZapiResponse.NotFoundRequest(
           'No Found',
@@ -129,8 +124,10 @@ export class OrganisationService {
    * @returns a promise of the organisation, throws an error if id does not exist
    * */
   async findProfileById(profileId: string): Promise<Profile> {
-    const profile = await this.profileRepo.findOne(profileId);
-    if (profile === undefined) {
+    const profile = await this.profileRepo.findOne({
+      where: { id: profileId },
+    });
+    if (profile === null) {
       throw new NotFoundException(
         ZapiResponse.NotFoundRequest(
           'No Found',
@@ -150,7 +147,7 @@ export class OrganisationService {
     const profile = await this.profileRepo.findOne({
       where: { email: userEmail },
     });
-    if (profile === undefined) {
+    if (profile === null) {
       throw new NotFoundException(
         ZapiResponse.NotFoundRequest(
           'No Found',
@@ -183,6 +180,27 @@ export class OrganisationService {
         );
       }
       return users;
+    }
+  }
+
+  /**
+   * It gets all organisation of a user that has a profile
+   * @Param - profileId: string  -id: string
+   * @returns a promise of ProfileOrg[], throws an error if profile id does not exist
+   */
+  async findOrgsByUser(profileId: string): Promise<ProfileOrg[] | null> {
+    try {
+      const organisations = await this.profileOrgRepo.find({
+        where: { profileId: profileId },
+      });
+      if (organisations.length === 0) {
+        return null;
+      }
+      return organisations;
+    } catch (error) {
+      throw new BadRequestException(
+        ZapiResponse.BadRequest('Server error', error.message, '500'),
+      );
     }
   }
 
@@ -321,7 +339,7 @@ export class OrganisationService {
     const user = await this.profileOrgRepo.findOne({
       where: { profileId: profileId, organisationId: id },
     });
-    if (user === undefined) {
+    if (user === null) {
       throw new NotFoundException(
         ZapiResponse.NotFoundRequest('Not Found', 'User not Found', '404'),
       );
