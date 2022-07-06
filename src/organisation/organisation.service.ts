@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { OrgRole } from 'src/common/enums/orgRole.enum';
 import { ZapiResponse } from 'src/common/helpers/response';
-import { Organisation } from 'src/entities/organisation.entity';
+import { Organisation } from '../entities/organisation.entity';
 import { OrganisationDto } from './dto/create-org.dto';
 import { OrgUserDto } from './dto/create-user.dto';
 import { Profile } from 'src/entities/profile.entity';

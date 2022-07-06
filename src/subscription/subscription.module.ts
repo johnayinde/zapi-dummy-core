@@ -2,17 +2,17 @@ import { Module } from '@nestjs/common';
 import { SubscriptionService } from './subscription.service';
 import { SubscriptionController } from './subscription.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { SubscriptionRepository } from '../database/repository/subscription.repository';
 import { JwtModule } from '@nestjs/jwt';
-import { APIRepository } from '../database/repository/api.repository';
-import { ProfileRepository } from '../database/repository/profile.repository';
+import { Subscription } from '../entities/subscription.entity';
+import { Api } from '../entities/api.entity';
+import { Profile } from '../entities/profile.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
-      SubscriptionRepository,
-      APIRepository,
-      ProfileRepository,
+      Subscription,
+      Api,
+      Profile
     ]),
     JwtModule.register({}),
   ],

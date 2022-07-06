@@ -1,6 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Profile } from '../entities/profile.entity';
-import { ProfileRepository } from '../database/repository/profile.repository';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { ZapiResponse } from '../common/helpers/response';
 import { InjectRepository } from '@nestjs/typeorm';

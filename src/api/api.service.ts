@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ZapiResponse } from 'src/common/helpers/response';
-import { Api } from 'src/entities/api.entity';
+import { Api } from '../entities/api.entity';
 import { Repository } from 'typeorm';
 import { CreateApiDto } from './dto/create-api.dto';
 import { UpdateApiDto } from './dto/update-api.dto';
