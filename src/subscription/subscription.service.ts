@@ -113,7 +113,7 @@ export class SubscriptionService {
       // the api's subscriptions column is checked if it includes this current user through its profileID
       const subscribed =  api.subscriptions.includes(profile.id)
       if (subscribed){
-        return ['user is subscribed to this API, in production this would return the request made by the user']
+        return {subscribed: true}
         // in production this would return the request made by the user on the api
       }
       throw new UnauthorizedException(
