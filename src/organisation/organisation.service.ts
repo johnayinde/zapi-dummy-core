@@ -8,10 +8,13 @@ import { ZapiResponse } from 'src/common/helpers/response';
 import { Organisation } from '../entities/organisation.entity';
 import { OrganisationDto } from './dto/create-org.dto';
 import { OrgUserDto } from './dto/create-user.dto';
-import { Profile } from '../entities/profile.entity';
-import { ProfileOrg } from '../entities/profile-org.entity';
+import { Profile } from 'src/entities/profile.entity';
+import { ProfileOrg } from 'src/entities/profile-org.entity';
+import { UpdateOrganisationDto } from './dto/update-org.dto';
+import { DeleteUserDto } from './dto/delete-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
 
 @Injectable()
 export class OrganisationService {
@@ -30,46 +33,38 @@ export class OrganisationService {
    * @returns It returns a promise of the created organisation and organisation teammates, throws an error if organisation or profile already exist
    * */
   async createOrganisation(profileId: string, orgDto: OrganisationDto) {
-    try {
-      /*Get profile by id, return an error if id does not exist */
-      const profile = await this.findProfileById(profileId);
-      const organisation = await this.orgRepo.findOne({
-        where: { name: orgDto.name },
-      });
-      if (organisation) {
-        throw new BadRequestException(
-          ZapiResponse.BadRequest(
-            'Unauthorized',
-            'An Organisation with this name already exist, use another name',
-            '401',
-          ),
-        );
-      }
-
-      const newOrg = this.orgRepo.create({
-        name: orgDto.name,
-        number_of_seats: orgDto.number_of_seats,
-        number_of_employees: orgDto.number_of_employees,
-        price_per_month: 0,
-        profile: profile,
-        profileId: profile.id,
-      });
-
-      const organisationEntry = await this.orgRepo.save(newOrg);
-      const orgUsers = await this.addUserToOrg(
-        organisationEntry.id,
-        profile.id,
-        {
-          email: profile.email,
-          role: OrgRole.ADMIN,
-        },
-      );
-      return { ...organisationEntry, AdminProfileOrgId: orgUsers.id };
-    } catch (error) {
+    /*Get profile by id, return an error if id does not exist */
+    const profile = await this.findProfileById(profileId);
+    const organisation = await this.orgRepo.findOne({
+      where: { name: orgDto.name },
+    });
+    if (organisation !== undefined) {
       throw new BadRequestException(
-        ZapiResponse.BadRequest('Server Error', error.message, '500'),
+        ZapiResponse.BadRequest(
+          'Unauthorized',
+          'An Organisation with this name already exist, use another name',
+          '401',
+        ),
       );
     }
+
+    const newOrg = this.orgRepo.create({
+      ...orgDto,
+      price_per_month: 0,
+      profile: profile,
+      profileId: profile.id,
+    });
+
+    const organisationEntry = await this.orgRepo.save(newOrg);
+    const orgUsers = await this.addUserToOrg(
+      organisationEntry.id,
+      profile.id,
+      {
+        email: profile.email,
+        role: OrgRole.ADMIN,
+      },
+    );
+    return { ...organisationEntry, AdminProfileOrgId: orgUsers.id };
   }
 
   /**
@@ -78,41 +73,35 @@ export class OrganisationService {
    * @returns it returns a promise of the added user, throws an error if user is already added or if user profile does not exist it
    * */
   async addUserToOrg(id: string, profileId: string, orgUserDto: OrgUserDto) {
-    try {
-      /*Get organisation by Id, return an error if id does not exist*/
-      const organisation = await this.findOrganisationById(id);
+    /*Get organisation by Id, return an error if id does not exist*/
+    const organisation = await this.findOrganisationById(id);
 
-      // ensure that only admin can add users to org, else throws an error
-      if (orgUserDto.role === OrgRole.DEVELOPER) {
-        await this.checkForAdminRole(id, profileId);
-      }
-      /*Get profile by email, return an error if email does not exist*/
-      const profile = await this.findUserProfileByEmail(orgUserDto.email);
-      const existingUser = await this.profileOrgRepo.findOne({
-        where: { profileId: profile.id, organisationId: id },
-      });
-      if (existingUser) {
-        throw new BadRequestException(
-          ZapiResponse.BadRequest(
-            'Unauthorized',
-            'This user is already registered in this organisation',
-            '401',
-          ),
-        );
-      }
-      const newUser = this.profileOrgRepo.create({
-        organisation: organisation,
-        organisationId: id,
-        profile: profile,
-        profileId: profile.id,
-        role: orgUserDto.role,
-      });
-      return await this.profileOrgRepo.save(newUser);
-    } catch (error) {
+    // ensure that only admin can add users to org, else throws an error
+    if (orgUserDto.role === OrgRole.DEVELOPER) {
+      await this.checkForAdminRole(id, profileId);
+    }
+    /*Get profile by email, return an error if email does not exist*/
+    const profile = await this.findUserProfileByEmail(orgUserDto.email);
+    const existingUser = await this.profileOrgRepo.findOne({
+      where: { profileId: profile.id, organisationId: id },
+    });
+    if (existingUser !== undefined) {
       throw new BadRequestException(
-        ZapiResponse.BadRequest('Internal Server Error', error.message, '500'),
+        ZapiResponse.BadRequest(
+          'Unauthorized',
+          'This user is already registered in this organisation',
+          '401',
+        ),
       );
     }
+    const newUser = this.profileOrgRepo.create({
+      organisation: organisation,
+      organisationId: id,
+      profile: profile,
+      profileId: profile.id,
+      role: orgUserDto.role,
+    });
+    return await this.profileOrgRepo.save(newUser);
   }
 
   /**
@@ -121,48 +110,36 @@ export class OrganisationService {
    * @returns a promise of the organisation, throws an error if id does not exist
    * */
   async findOrganisationById(id: string): Promise<Organisation> {
-    try {
-      const org = await this.orgRepo.findOne({where : { id }});
-      if (!org) {
-        throw new NotFoundException(
-          ZapiResponse.NotFoundRequest(
-            'No Found',
-            'Organisation does not exist',
-            '404',
-          ),
-        );
-      }
-      return org;
-    } catch (error) {
-      throw new BadRequestException(
-        ZapiResponse.BadRequest('Server error', error.message, '500'),
+    const org = await this.orgRepo.findOne(id);
+    if (org === undefined) {
+      throw new NotFoundException(
+        ZapiResponse.NotFoundRequest(
+          'No Found',
+          'Organisation does not exist',
+          '404',
+        ),
       );
     }
+    return org;
   }
 
   /**
-   * It find profile by Id,
+   * It find profile by Id
    * @Param {string} id - the profile id
    * @returns a promise of the organisation, throws an error if id does not exist
    * */
   async findProfileById(profileId: string): Promise<Profile> {
-    try {
-      const profile = await this.profileRepo.findOne({where : { id: profileId}});
-      if (!profile) {
-        throw new NotFoundException(
-          ZapiResponse.NotFoundRequest(
-            'No Found',
-            'Profile does not exist',
-            '404',
-          ),
-        );
-      }
-      return profile;
-    } catch (error) {
-      throw new BadRequestException(
-        ZapiResponse.BadRequest('Server error', error.message, '500'),
+    const profile = await this.profileRepo.findOne(profileId);
+    if (profile === undefined) {
+      throw new NotFoundException(
+        ZapiResponse.NotFoundRequest(
+          'No Found',
+          'Profile does not exist',
+          '404',
+        ),
       );
     }
+    return profile;
   }
 
   /**Check if the user invited to an organisation have an existing profile
@@ -170,25 +147,19 @@ export class OrganisationService {
    * @returns a promise of profile, throws an error if profile does not exist
    * */
   async findUserProfileByEmail(userEmail: string): Promise<Profile> {
-    try {
-      const profile = await this.profileRepo.findOne({
-        where: { email: userEmail },
-      });
-      if (!profile) {
-        throw new NotFoundException(
-          ZapiResponse.NotFoundRequest(
-            'No Found',
-            'Profile email is does not exist, invite is invalid',
-            '404',
-          ),
-        );
-      }
-      return profile;
-    } catch (error) {
-      throw new BadRequestException(
-        ZapiResponse.BadRequest('Server error', error.message, '500'),
+    const profile = await this.profileRepo.findOne({
+      where: { email: userEmail },
+    });
+    if (profile === undefined) {
+      throw new NotFoundException(
+        ZapiResponse.NotFoundRequest(
+          'No Found',
+          'Profile email is does not exist, invite is invalid',
+          '404',
+        ),
       );
     }
+    return profile;
   }
 
   /**find users by organisation id
@@ -196,28 +167,22 @@ export class OrganisationService {
    * @returns a promise of profileOrg[], throws an error if id does not exist
    * */
   async findUsersByOrgId(id: string): Promise<ProfileOrg[]> {
-    try {
-      // check if org exist, else throws an error
-      const org = await this.findOrganisationById(id);
-      if (org) {
-        const users = await this.profileOrgRepo.find({
-          where: { organisationId: id },
-        });
-        if (users.length === 0) {
-          throw new NotFoundException(
-            ZapiResponse.NotFoundRequest(
-              'Not Found',
-              'Users not Found in this organisation',
-              '404',
-            ),
-          );
-        }
-        return users;
+    // check if org exist, else throws an error
+    const org = await this.findOrganisationById(id);
+    if (org) {
+      const users = await this.profileOrgRepo.find({
+        where: { organisationId: id },
+      });
+      if (users.length === 0) {
+        throw new NotFoundException(
+          ZapiResponse.NotFoundRequest(
+            'Not Found',
+            'Users not Found in this organisation',
+            '404',
+          ),
+        );
       }
-    } catch (error) {
-      throw new BadRequestException(
-        ZapiResponse.BadRequest('Server Error', error.message, '500'),
-      );
+      return users;
     }
   }
 
@@ -241,25 +206,19 @@ export class OrganisationService {
    * @returns a promise of the deleted organisation and organisation teammates, returns an error if id does not exist
    * */
   async removeOrganisation(id: string, profileId: string) {
-    try {
-      /*Check if organisation id and Profile Id exist otherwise throws an error */
-      const org = await this.verifyIdsAndReturnOrg(id, profileId);
-      if (org) {
-        /* checking if Admin is deleting organisation*/
-        await this.checkForAdminRole(
-          id,
-          profileId,
-          'Only Admin can delete organisation',
-        );
-        /**Remove both users and organisation */
-        const deletedOrgUsers = await this.removeOrgUsers(org.id);
-        const deletedOrg = await this.orgRepo.remove(org);
-        return { ...deletedOrg, organisationUsers: deletedOrgUsers };
-      }
-    } catch (error) {
-      throw new BadRequestException(
-        ZapiResponse.BadRequest('Server error', error.message, '500'),
+    /*Check if organisation id and Profile Id exist otherwise throws an error */
+    const org = await this.verifyIdsAndReturnOrg(id, profileId);
+    if (org) {
+      /* checking if Admin is deleting organisation*/
+      await this.checkForAdminRole(
+        id,
+        profileId,
+        'Only Admin can delete organisation',
       );
+      /**Remove both users and organisation */
+      const deletedOrgUsers = await this.removeOrgUsers(org.id);
+      const deletedOrg = await this.orgRepo.remove(org);
+      return { ...deletedOrg, organisationUsers: deletedOrgUsers };
     }
   }
 
@@ -281,25 +240,107 @@ export class OrganisationService {
   }
 
   /**
+   * Remove an organisation user
+   * @Param {string} id - the organisation id - profileId - the profile id of Admin - userEmail - user email
+   * @returns a promise of the deleted user
+   * */
+  async removeUser(id: string, profileId: string, orgUser: DeleteUserDto) {
+    /*Check if organisation id and Profile Id exist */
+    const org = await this.verifyIdsAndReturnOrg(id, profileId);
+
+    if (org) {
+      /* checking if Admin is removing a user*/
+      await this.checkForAdminRole(
+        id,
+        profileId,
+        'Only Admin can delete organisation',
+      );
+
+      /**Verify email of user */
+      const userProfile = await this.findUserProfileByEmail(orgUser.email);
+      const user = await this.checkIfOrgUserExist(id, userProfile.id);
+
+      // admin deleting himself && admin is the only admin
+      if (userProfile.id === profileId && user.role === OrgRole.ADMIN) {
+        /** check if Admin is deleting removing himself and if Admin is the only one with the admin role
+         * then Admin cannot remove himself if he is the only admin*/
+        throw new BadRequestException(
+          ZapiResponse.BadRequest(
+            'Unauthorized',
+            'This Admin cannot be deleted, organisation must have at least one Admin, delete organisation instead',
+            '401',
+          ),
+        );
+      }
+      return await this.profileOrgRepo.remove(user);
+    }
+  }
+
+  /**
+   * It find an existing organisation by Id and update it
+   * @Param - id - the organisation id - profileId - the profile id of Admin - updateOrgDto - UpdateOrganisationDto
+   * @returns a promise of the updated organisation, throws an error  if id does not exist
+   * */
+  async updateOrganisation(
+    id: string,
+    profileId: string,
+    updateOrgDto: UpdateOrganisationDto,
+  ) {
+    /*Check if organisation id and Profile Id exist */
+    const org = await this.verifyIdsAndReturnOrg(id, profileId);
+    if (org) {
+      /* checking if Admin is updating*/
+      await this.checkForAdminRole(
+        id,
+        profileId,
+        'Only Admin can update organisation',
+      );
+      const updatedOrg = await this.orgRepo.update(id, updateOrgDto);
+      if (updatedOrg) {
+        return updatedOrg;
+      } else {
+        ZapiResponse.NotFoundRequest(
+          'Not Found',
+          'Organisation does not exist',
+          '404',
+        );
+      }
+    }
+  }
+
+  /**
+   * check if user is an organisation exist
+   * @Param id - the organisation id -profileId - the profile id of Admin
+   * @returns a promise of ProfileOrg | throws an error if any id does not exist
+   * */
+  async checkIfOrgUserExist(
+    id: string,
+    profileId: string,
+  ): Promise<ProfileOrg> {
+    /**find a user in organisation, throw an error if any id does not exist */
+    const user = await this.profileOrgRepo.findOne({
+      where: { profileId: profileId, organisationId: id },
+    });
+    if (user === undefined) {
+      throw new NotFoundException(
+        ZapiResponse.NotFoundRequest('Not Found', 'User not Found', '404'),
+      );
+    }
+    return user;
+  }
+
+  /**
    * check if profile is an admin role in the organisation
    * @Param id - the organisation id -profileId - the profile id of Admin - error_string - error string
-   * @returns a promise of the profileOrg
+   * @returns void | throws an error if profile is not admin
    * */
   async checkForAdminRole(
     id: string,
     profileId: string,
     error_string = 'Only admin can add user to this organisation',
   ) {
-    /**find a user in organisation, throw an error if any id does not exist */
-    const user = await this.profileOrgRepo.findOne({
-      where: { profileId: profileId, organisationId: id },
-    });
-    if (!user) {
-      throw new NotFoundException(
-        ZapiResponse.NotFoundRequest('Not Found', 'User not Found', '404'),
-      );
-    }
     /* if role is an Admin, then continue, otherwise, throw an error*/
+    const user = await this.checkIfOrgUserExist(id, profileId);
     if (user.role !== OrgRole.ADMIN) {
       throw new BadRequestException(
         ZapiResponse.BadRequest('Unauthorized', error_string, '401'),
@@ -317,17 +358,11 @@ export class OrganisationService {
     id: string,
     profileId: string,
   ): Promise<Organisation> {
-    try {
-      /*Get profile by id, throws an error if id does not exist */
-      const profile = await this.findProfileById(profileId);
-      if (profile) {
-        /*Get org by Id, throws an error if id does not exist*/
-        return await this.findOrganisationById(id);
-      }
-    } catch (error) {
-      throw new BadRequestException(
-        ZapiResponse.BadRequest('Server Error', error.message, '500'),
-      );
+    /*Get profile by id, throws an error if id does not exist */
+    const profile = await this.findProfileById(profileId);
+    if (profile) {
+      /*Get org by Id, throws an error if id does not exist*/
+      return await this.findOrganisationById(id);
     }
   }
 }
