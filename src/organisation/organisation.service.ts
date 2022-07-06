@@ -186,7 +186,7 @@ export class OrganisationService {
   /**
    * It gets all organisation of a user that has a profile
    * @Param - profileId: string  -id: string
-   * @returns a promise of ProfileOrg[], throws an error if profile id does not exist
+   * @returns a promise of ProfileOrg[], return null if no organisation exist for user, throws an error if profile id does not exist
    */
   async findOrgsByUser(profileId: string): Promise<ProfileOrg[] | null> {
     try {
