@@ -6,6 +6,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { Subscription } from '../entities/subscription.entity';
 import { Api } from '../entities/api.entity';
 import { Profile } from '../entities/profile.entity';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { Profile } from '../entities/profile.entity';
       Profile
     ]),
     JwtModule.register({}),
+    HttpModule
   ],
   controllers: [SubscriptionController],
   providers: [SubscriptionService],

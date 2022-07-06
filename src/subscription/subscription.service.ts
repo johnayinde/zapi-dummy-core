@@ -1,7 +1,9 @@
+import { HttpModule, HttpService } from '@nestjs/axios';
 import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -11,7 +13,8 @@ import { Api } from 'src/entities/api.entity';
 import { Profile } from 'src/entities/profile.entity';
 import { Subscription } from 'src/entities/subscription.entity';
 import { Repository } from 'typeorm';
-import { createSubscriptionDto } from './dto/create-subscription.dto';
+import { createSubscriptionDto} from './dto/create-subscription.dto';
+import { VerifySubscriptionDto } from './dto/verify-subscription.dto';
 
 @Injectable()
 export class SubscriptionService {
@@ -23,6 +26,7 @@ export class SubscriptionService {
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
     private jwtService: JwtService,
+    private httpService: HttpService
   ) {}
 
   /**
@@ -97,4 +101,35 @@ export class SubscriptionService {
     );
     return { subscriptionToken };
   }
+
+  async verifySub(token: string){
+    const secret = process.env.JWT_SUBSCRIPTION_SECRET
+    // const userRequest = await this.httpService.axiosRef.post('request url', {data: 'something'})
+    try {
+      const {apiId, profileId} = this.jwtService.verify(token,{secret})
+      const api = await this.apiRepository.findOneBy({id: apiId})
+      const profile = await this.profileRepository.findOneBy({id: profileId })
+      const subscribed =  api.subscriptions.includes(profile.id)
+      if (subscribed){
+        return ['user is subscribed to this API, in production this would return the request made by the user']
+        // in production this would return the request made by the user on the api
+      }
+      throw new UnauthorizedException(
+        ZapiResponse.BadRequest('Unauthorized', 'user not subscribed to this api', '401')
+      )
+      
+    } catch (error) {
+      if( error.name === 'JsonWebTokenError'){
+        throw new UnauthorizedException(
+          ZapiResponse.BadRequest('Subscription Error', "User's subscription has expired", '403')
+        )
+      } else {
+        throw new BadRequestException(
+          ZapiResponse.BadRequest('Internal Server Error', 'Something went wrong', '500')
+        )
+      }
+    }
+
+  }
+
 }
