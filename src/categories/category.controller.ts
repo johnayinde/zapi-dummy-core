@@ -8,6 +8,7 @@ import {
   Delete,
   Param,
   ParseUUIDPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { ZapiResponse } from '../common/helpers/response/Response';
 import { Ok } from 'src/common/helpers/response/ResponseType';
@@ -15,6 +16,7 @@ import { CategoryService } from './category.service';
 import { Category } from '../entities/category.entity';
 import { CreateCategoriesDto } from './dto/categories.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { CategoryIdGuard } from './category-id.guard';
 
 @ApiTags('Categories')
 @Controller('categories')
@@ -51,5 +53,11 @@ export class CategoryController {
   async findOneById(@Param('id', new ParseUUIDPipe()) id: string) {
     const category = await this.categoryservice.findOneById(id);
     return ZapiResponse.Ok(category, 'Ok', '200');
+  }
+
+  @Get('/test/:categoryId')
+  @UseGuards(CategoryIdGuard)
+  async createCategoryId() {
+    return 'testing';
   }
 }
