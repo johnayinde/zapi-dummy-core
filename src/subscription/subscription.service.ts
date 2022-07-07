@@ -112,6 +112,15 @@ export class SubscriptionService {
           ),
         });
 
+        const subscription = await this.subRepository.findOne({
+          where: {
+            apiId: createSubDto.apiId,
+            profileId: createSubDto.profileId,
+          },
+        });
+
+        await this.subRepository.delete(subscription.id);
+
         return ZapiResponse.Ok('Success', 'Unsubscribe successful', '200');
       } else {
         throw new NotFoundException(
