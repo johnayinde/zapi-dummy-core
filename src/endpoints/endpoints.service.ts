@@ -4,7 +4,7 @@ import { ZapiResponse } from 'src/common/helpers/response';
 import { Endpoint } from '../entities/endpoint.entity';
 import { Repository } from 'typeorm';
 import { CreateEndpointDto } from './dto/create-endpoint.dto';
-
+import { AppDataSource } from 'ormconfig';
 @Injectable()
 export class EndpointsService {
   constructor(
@@ -72,6 +72,16 @@ export class EndpointsService {
   async findOneById(id: string): Promise<Endpoint> {
     try {
       return await this.endpointRepository.findOne({ where: { id } });
+    } catch (error) {
+      throw new BadRequestException(
+        ZapiResponse.BadRequest('Internal Server error', error.message, '500'),
+      );
+    }
+  }
+
+  async getAllApiEndpoints(apiId:string): Promise<Endpoint[]> {
+    try {
+      return await this.endpointRepository.find({ where: { apiId: apiId }});
     } catch (error) {
       throw new BadRequestException(
         ZapiResponse.BadRequest('Internal Server error', error.message, '500'),

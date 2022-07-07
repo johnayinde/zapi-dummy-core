@@ -39,4 +39,12 @@ export class EndpointsController {
     const endpoint = await this.endpointsService.findOneById(id);
     return ZapiResponse.Ok(endpoint, 'Ok', '200');
   }
+
+    /* This is a get request that takes in a parameter and returns a promise of an endpoint. */
+    @Get('/single-api/:apiId')
+    @ApiOperation({ summary: 'get all endpoint for an api' })
+    async findAllByApiId(@Param('apiId') apiId: string): Promise<Ok<Endpoint[]>> {
+      const endpoint = await this.endpointsService.getAllApiEndpoints(apiId);
+      return ZapiResponse.Ok(endpoint, 'Ok', '200');
+    }
 }

@@ -110,7 +110,7 @@ export class OrganisationService {
    * @returns a promise of the organisation, throws an error if id does not exist
    * */
   async findOrganisationById(id: string): Promise<Organisation> {
-    const org = await this.orgRepo.findOne(id);
+    const org = await this.orgRepo.findOne({ where : { id }});
     if (org === undefined) {
       throw new NotFoundException(
         ZapiResponse.NotFoundRequest(
@@ -129,7 +129,7 @@ export class OrganisationService {
    * @returns a promise of the organisation, throws an error if id does not exist
    * */
   async findProfileById(profileId: string): Promise<Profile> {
-    const profile = await this.profileRepo.findOne(profileId);
+    const profile = await this.profileRepo.findOne({ where : { id: profileId }});
     if (profile === undefined) {
       throw new NotFoundException(
         ZapiResponse.NotFoundRequest(
