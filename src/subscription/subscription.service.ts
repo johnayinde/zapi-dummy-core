@@ -35,8 +35,11 @@ export class SubscriptionService {
   async subscribe(createSubDto: createSubscriptionDto): Promise<Tokens> {
     const { profileId, apiId } = createSubDto;
     try {
-      const api = await this.apiRepository.findOne({where : { id: apiId}});
-      const profile = await this.profileRepository.findOne({where : { id: profileId}});
+      const api = await this.apiRepository.findOne({ where: { id: apiId } });
+      const profile = await this.profileRepository.findOne({
+        where: { id: profileId },
+      });
+
       const subscribed = profile.subscriptions.includes(apiId);
 
       if (subscribed) {
@@ -74,6 +77,60 @@ export class SubscriptionService {
           '404',
         ),
       );
+    } catch (error) {
+      throw new BadRequestException(
+        ZapiResponse.BadRequest('Internal Server error', error.message, '500'),
+      );
+    }
+  }
+
+  /**
+   * It takes in a createSubscriptionDto object, checks if the user is already subscribed to the api, and the unsubscribe the user
+   * @param {createSubscriptionDto} createSubDto - createSubscriptionDto
+   * @returns The subscription object
+   */
+
+  async unsubscribe(createSubDto: createSubscriptionDto): Promise<object> {
+    const { profileId, apiId } = createSubDto;
+    try {
+      const api = await this.apiRepository.findOne({ where: { id: apiId } });
+      const profile = await this.profileRepository.findOne({
+        where: { id: profileId },
+      });
+      const subscribed = profile.subscriptions.includes(apiId);
+
+      if (subscribed) {
+        await this.profileRepository.update(profile.id, {
+          subscriptions: [...profile.subscriptions].filter(
+            (id) => id !== api.id,
+          ),
+        });
+
+        await this.apiRepository.update(api.id, {
+          subscriptions: [...api.subscriptions].filter(
+            (id) => id !== profile.id,
+          ),
+        });
+
+        const subscription = await this.subRepository.findOne({
+          where: {
+            apiId: createSubDto.apiId,
+            profileId: createSubDto.profileId,
+          },
+        });
+
+        await this.subRepository.delete(subscription.id);
+
+        return ZapiResponse.Ok('Success', 'Unsubscribe successful', '200');
+      } else {
+        throw new NotFoundException(
+          ZapiResponse.BadRequest(
+            'Bad Request',
+            'You are not subscribed to this api',
+            '400',
+          ),
+        );
+      }
     } catch (error) {
       throw new BadRequestException(
         ZapiResponse.BadRequest('Internal Server error', error.message, '500'),
