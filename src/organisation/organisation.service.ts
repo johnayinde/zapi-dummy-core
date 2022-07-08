@@ -15,7 +15,6 @@ import { DeleteUserDto } from './dto/delete-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-
 @Injectable()
 export class OrganisationService {
   constructor(
@@ -56,14 +55,10 @@ export class OrganisationService {
     });
 
     const organisationEntry = await this.orgRepo.save(newOrg);
-    const orgUsers = await this.addUserToOrg(
-      organisationEntry.id,
-      profile.id,
-      {
-        email: profile.email,
-        role: OrgRole.ADMIN,
-      },
-    );
+    const orgUsers = await this.addUserToOrg(organisationEntry.id, profile.id, {
+      email: profile.email,
+      role: OrgRole.ADMIN,
+    });
     return { ...organisationEntry, AdminProfileOrgId: orgUsers.id };
   }
 
@@ -110,7 +105,7 @@ export class OrganisationService {
    * @returns a promise of the organisation, throws an error if id does not exist
    * */
   async findOrganisationById(id: string): Promise<Organisation> {
-    const org = await this.orgRepo.findOne({ where : { id }});
+    const org = await this.orgRepo.findOne({ where: { id } });
     if (org === undefined) {
       throw new NotFoundException(
         ZapiResponse.NotFoundRequest(
@@ -129,7 +124,9 @@ export class OrganisationService {
    * @returns a promise of the organisation, throws an error if id does not exist
    * */
   async findProfileById(profileId: string): Promise<Profile> {
-    const profile = await this.profileRepo.findOne({ where : { id: profileId }});
+    const profile = await this.profileRepo.findOne({
+      where: { id: profileId },
+    });
     if (profile === undefined) {
       throw new NotFoundException(
         ZapiResponse.NotFoundRequest(
@@ -364,5 +361,20 @@ export class OrganisationService {
       /*Get org by Id, throws an error if id does not exist*/
       return await this.findOrganisationById(id);
     }
+  }
+
+  /**find users by organisation id
+   * @Param - profileId: string  -id: string
+   * @returns a promise of profileOrg[], throws an error if id does not exist
+   * */
+  async findUserOrgs(profileId: string): Promise<Organisation[]> {
+    const users = await this.profileOrgRepo.find({
+      where: { profileId },
+    });
+    return Promise.all(
+      users.map((proofilOrg) =>
+        this.orgRepo.findOne({ where: { id: proofilOrg.organisationId } }),
+      ),
+    );
   }
 }
