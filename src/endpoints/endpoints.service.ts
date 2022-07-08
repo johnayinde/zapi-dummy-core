@@ -105,8 +105,8 @@ export class EndpointsService {
     updateEndpointDto: UpdateEndpointDto,
   ): Promise<Endpoint> {
     try {
-      const endpoint = await this.endpointRepository.find({
-        where: { apiId: id },
+      const endpoint = await this.endpointRepository.findOne({
+        where: { id },
       });
       if (endpoint) {
         await this.endpointRepository.update(id, updateEndpointDto);
@@ -117,10 +117,12 @@ export class EndpointsService {
           return updatedEndpoint;
         }
       } else {
-        ZapiResponse.NotFoundRequest(
-          'Not Found',
-          'Endpoint does not exist',
-          '404',
+        throw new BadRequestException(
+          ZapiResponse.NotFoundRequest(
+            'Not Found',
+            'Endpoint does not exist',
+            '404',
+          ),
         );
       }
     } catch (error) {
