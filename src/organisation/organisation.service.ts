@@ -37,7 +37,7 @@ export class OrganisationService {
     const organisation = await this.orgRepo.findOne({
       where: { name: orgDto.name },
     });
-    if (organisation !== undefined) {
+    if (organisation != undefined) {
       throw new BadRequestException(
         ZapiResponse.BadRequest(
           'Unauthorized',
@@ -80,7 +80,7 @@ export class OrganisationService {
     const existingUser = await this.profileOrgRepo.findOne({
       where: { profileId: profile.id, organisationId: id },
     });
-    if (existingUser !== undefined) {
+    if (existingUser != undefined) {
       throw new BadRequestException(
         ZapiResponse.BadRequest(
           'Unauthorized',
