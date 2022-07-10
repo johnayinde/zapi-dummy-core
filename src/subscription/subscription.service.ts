@@ -17,7 +17,6 @@ import { createSubscriptionDto } from './dto/create-subscription.dto';
 import { SubscriptionApiCallDto } from './dto/make-request.dto';
 import { HttpService } from '@nestjs/axios';
 
-
 @Injectable()
 export class SubscriptionService {
   constructor(
@@ -27,7 +26,7 @@ export class SubscriptionService {
     private readonly apiRepository: Repository<Api>,
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
-     @InjectRepository(Endpoint)
+    @InjectRepository(Endpoint)
     private readonly endpointRepository: Repository<Endpoint>,
     private httpService: HttpService,
     private jwtService: JwtService,
@@ -163,66 +162,83 @@ export class SubscriptionService {
     return { subscriptionToken };
   }
 
-  async verifySub(token: string){
-    const secret = process.env.JWT_SUBSCRIPTION_SECRET
+  async verifySub(token: string) {
+    const secret = process.env.JWT_SUBSCRIPTION_SECRET;
     // const userRequest = await this.httpService.axiosRef.post('request url', {data: 'something'})
     try {
-      const {apiId, profileId} = this.jwtService.verify(token,{secret})
+      const { apiId, profileId } = this.jwtService.verify(token, { secret });
       // both the API and the profile are fetched from the database
-      const api = await this.apiRepository.findOneBy({id: apiId})
-      const profile = await this.profileRepository.findOneBy({id: profileId })
+      const api = await this.apiRepository.findOneBy({ id: apiId });
+      const profile = await this.profileRepository.findOneBy({ id: profileId });
       // the api's subscriptions column is checked if it includes this current user through its profileID
-      const subscribed =  api.subscriptions.includes(profile.id)
-      if (!subscribed){
+      const subscribed = api.subscriptions.includes(profile.id);
+      if (!subscribed) {
         throw new UnauthorizedException(
-          ZapiResponse.BadRequest('Unauthorized', 'user not subscribed to this api', '401')
-        )
+          ZapiResponse.BadRequest(
+            'Unauthorized',
+            'user not subscribed to this api',
+            '401',
+          ),
+        );
       }
-      return { api, profile}
+      return { api, profile };
       // in production this would return the request made by the user on the api
-      
     } catch (error) {
-      if( error.name === 'JsonWebTokenError'){
+      if (error.name === 'JsonWebTokenError') {
         throw new UnauthorizedException(
-          ZapiResponse.BadRequest('Subscription Error', "User's subscription has expired", '403')
-        )
+          ZapiResponse.BadRequest(
+            'Subscription Error',
+            "User's subscription has expired",
+            '403',
+          ),
+        );
       } else {
         throw new BadRequestException(
-          ZapiResponse.BadRequest('Internal Server Error', 'Something went wrong', '500')
-        )
+          ZapiResponse.BadRequest(
+            'Internal Server Error',
+            'Something went wrong',
+            '500',
+          ),
+        );
       }
     }
-
   }
 
-  async makeSubscriptionRequest(token: string, body:SubscriptionApiCallDto){
-    const {api, profile} = await this.verifySub(token);
-    const endpoint =  await this.endpointRepository.findOne({ where: {
-      // apiId: api.id,
-      method: body.method,
-      route: body.route
-    }})
-    
-    if(!endpoint){
-      throw new BadRequestException( ZapiResponse.BadRequest("wrong endpoints"))
+  async makeSubscriptionRequest(token: string, body: SubscriptionApiCallDto) {
+    const { api, profile } = await this.verifySub(token);
+    const endpoint = await this.endpointRepository.findOne({
+      where: {
+        // apiId: api.id,
+        method: body.method,
+        route: body.route,
+      },
+    });
+
+    if (!endpoint) {
+      throw new BadRequestException(ZapiResponse.BadRequest('wrong endpoints'));
     }
     // we need too check that the name, data type and requirements foe each property in the
     //endpoints.payload are met explicitly
     const base_url = api.base_url;
-    const endRoute = endpoint.route
-    const endMethod = endpoint.method.toLowerCase()
-   
+    const endRoute = endpoint.route;
+    const endMethod = endpoint.method.toLowerCase();
 
-    const url = base_url + `${endRoute}`
- 
- 
-    const p = this.httpService.axiosRef
+    const url = base_url + `${endRoute}`;
+
+    const p = this.httpService.axiosRef;
     const axiosResponse = await p({
       method: endMethod,
       url: url,
-      data: body.payload
-    })
-    const data = axiosResponse.data
-    return data
+      data: body.payload,
+    });
+    const data = axiosResponse.data;
+    return data;
+  }
+
+  async getAllSubscriptions(profileId) {
+    const subIds = await (
+      await this.subRepository.find({ where: { profileId } })
+    ).map((sub) => this.apiRepository.find({ where: { id: sub.apiId } }));
+    return Promise.all(subIds)
   }
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Param } from '@nestjs/common';
+import { Body, Controller, Post, Param, Get } from '@nestjs/common';
 import { SubscriptionService } from './subscription.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Ok, ZapiResponse } from '../common/helpers/response';
@@ -42,5 +42,14 @@ export class SubscriptionController {
     // const verifySubscription = await this.subscriptionService.verifySub(verifysub)
     const verifySubscription = await this.subscriptionService.makeSubscriptionRequest(token, subscriptionApiCall)
     return ZapiResponse.Ok(verifySubscription, 'user is subcribed to this api', '200')
+  }
+
+  @Get(':profileId/all')
+  @ApiOperation({summary: 'Get all apis a user is subscribed to'})
+  async getAllSubscriptions(
+    @Param("profileId") profileId: string,
+  ){
+    const subscriptions = await this.subscriptionService.getAllSubscriptions(profileId);
+    return ZapiResponse.Ok(subscriptions, 'User Subscriptions')
   }
 }
