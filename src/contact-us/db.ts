@@ -1,17 +1,17 @@
-export const contactUs = [
-  {
-    contactId: '1',
-    firstName: 'firstName',
-    lastName: 'lastName',
-    phoneNo: '09099999',
-    businessEmail: 'hhh@example.com',
-    countryId: 'AX',
-    countryNames: 'Nigeria',
-    companyName: 'mybusiness',
-    topicName: 'Support',
-    additionalInfo: 'nothing',
-  },
-];
+// export const contactUs = [
+//   {
+//     contactId: '1',
+//     firstName: 'firstName',
+//     lastName: 'lastName',
+//     phoneNo: '09099999',
+//     businessEmail: 'hhh@example.com',
+//     countryId: 'AX',
+//     countryNames: 'Nigeria',
+//     companyName: 'mybusiness',
+//     topicName: 'Support',
+//     additionalInfo: 'nothing',
+//   },
+// ];
 export const helpTopics = [
   { topicId: '1', topicName: 'How Can We Help' },
   { topicId: '2', topicName: 'General Inquiry' },

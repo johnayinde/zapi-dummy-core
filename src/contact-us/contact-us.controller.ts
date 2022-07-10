@@ -22,7 +22,7 @@ export class ContactUsController {
   }
 
   @Post()
-  createContactUs(@Body() payload: CreateContactFormDto): ContactFormDto {
+  createContactUs(@Body() payload: CreateContactFormDto) {
     return this.ContactUs.createContactUs(payload);
   }
 }

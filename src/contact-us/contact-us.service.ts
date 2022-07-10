@@ -1,54 +1,54 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ZapiResponse } from 'src/common/helpers/response';
+import { ContactUs } from 'src/entities/contact-us.entity';
+import { Repository } from 'typeorm';
 
-import { helpTopics, countries, contactUs } from './db';
+import { helpTopics, countries } from './db';
 import {
   TopicResponseDto,
   CountryResponseDto,
   CreateContactFormDto,
-  ContactFormDto,
 } from './dto';
 
 @Injectable()
 export class ContactUsService {
   private topicNames = helpTopics;
   private countryNames = countries;
-  private contactUs = contactUs;
 
+  constructor(
+    @InjectRepository(ContactUs)
+    private readonly contactUsRepository: Repository<ContactUs>,
+  ) {}
+
+  // list of country names
   getCountries(): CountryResponseDto[] {
     return this.countryNames;
   }
 
+  //  list of possible topics
   getTopics(): TopicResponseDto[] {
     return this.topicNames;
   }
 
-  phoneNoCheck(phoneNo: string, countryId: string) {
-    return this.contactUs.find((contact) => {
-      return contact.phoneNo === phoneNo && contact.countryId === countryId;
-    });
-  }
+  // organise contact details by phone-no and eamil-address
 
-  emailCheck(email: string) {
-    return this.contactUs.find((contact) => {
-      return contact.businessEmail === email;
-    });
-  }
+  // send newly created contactus to support email address
+  async sendContactDetailsToSupport() {}
 
-  createContactUs(payload: CreateContactFormDto): ContactFormDto {
-    const contactLength = this.contactUs.length + 2;
-    const contactId: string = contactLength.toString();
+  // save contact details
+  async createContactUs(payload: CreateContactFormDto) {
+    try {
+      const newContactUsDetails = this.contactUsRepository.create(payload);
 
-    if (this.phoneNoCheck(payload.phoneNo, payload.countryId)) {
-      //add data to existing phoneNo data
-    } else if (this.emailCheck(payload.businessEmail)) {
-      //add data to existing business email
-    } else {
-      const newContactUsData = {
-        contactId,
-        ...payload,
-      };
-      this.contactUs.push(newContactUsData);
-      return newContactUsData;
+      this.contactUsRepository.save(newContactUsDetails);
+
+      return newContactUsDetails;
+    } catch (e) {
+      console.log(e);
+      throw new BadRequestException(
+        ZapiResponse.BadRequest('error saving data', e),
+      );
     }
   }
 }
