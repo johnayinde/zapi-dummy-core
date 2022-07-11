@@ -109,7 +109,7 @@ export class OrganisationService {
     if (org === null) {
       throw new NotFoundException(
         ZapiResponse.NotFoundRequest(
-          'No Found',
+          'Not Found',
           'Organisation does not exist',
           '404',
         ),
@@ -186,17 +186,25 @@ export class OrganisationService {
   /**
    * It gets all organisation of a user that has a profile
    * @Param - profileId: string  -id: string
-   * @returns a promise of ProfileOrg[], return null if no organisation exist for user, throws an error if profile id does not exist
+   * @returns a promise of Organisation[] and correponding roles, return null if no organisation exist for user, throws an error if profile id does not exist
    */
-  async findOrgsByUser(profileId: string): Promise<ProfileOrg[] | null> {
+  async findOrgsByUser(profileId: string) {
     try {
-      const organisations = await this.profileOrgRepo.find({
+      const profileOrgs = await this.profileOrgRepo.find({
         where: { profileId: profileId },
       });
-      if (organisations.length === 0) {
+      if (profileOrgs.length === 0) {
         return null;
       }
-      return organisations;
+      const orgs = [];
+      for (const index in profileOrgs) {
+        const org = await this.findOrganisationById(
+          profileOrgs[index].organisationId,
+        );
+        orgs.push({ ...org, role: profileOrgs[index].role });
+      }
+
+      return orgs;
     } catch (error) {
       throw new BadRequestException(
         ZapiResponse.BadRequest('Server error', error.message, '500'),
