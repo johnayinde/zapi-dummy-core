@@ -66,7 +66,7 @@ export class OrganisationController {
   }
 
   @Get('profile/:profileId')
-  @ApiOperation({ summary: 'Get organisations of a profile' })
+  @ApiOperation({ summary: 'Get all organisations a user belongs to' })
   async getuserOrgs(@Param('profileId') profileId: string) {
     const userOrg = await this.orgService.findOrgsByUser(profileId);
     return ZapiResponse.Ok(userOrg, 'All organisations of a user', 200);
