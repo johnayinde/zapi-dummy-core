@@ -15,7 +15,6 @@ import { DeleteUserDto } from './dto/delete-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-
 @Injectable()
 export class OrganisationService {
   constructor(
@@ -56,14 +55,10 @@ export class OrganisationService {
     });
 
     const organisationEntry = await this.orgRepo.save(newOrg);
-    const orgUsers = await this.addUserToOrg(
-      organisationEntry.id,
-      profile.id,
-      {
-        email: profile.email,
-        role: OrgRole.ADMIN,
-      },
-    );
+    const orgUsers = await this.addUserToOrg(organisationEntry.id, profile.id, {
+      email: profile.email,
+      role: OrgRole.ADMIN,
+    });
     return { ...organisationEntry, AdminProfileOrgId: orgUsers.id };
   }
 

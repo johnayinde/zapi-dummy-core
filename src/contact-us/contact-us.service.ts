@@ -31,8 +31,6 @@ export class ContactUsService {
     return this.topicNames;
   }
 
-  // organise contact details by phone-no and eamil-address
-
   // send newly created contactus to support email address
   async sendContactDetailsToSupport() {}
 
@@ -45,9 +43,8 @@ export class ContactUsService {
 
       return newContactUsDetails;
     } catch (e) {
-      console.log(e);
       throw new BadRequestException(
-        ZapiResponse.BadRequest('error saving data', e),
+        ZapiResponse.BadRequest('Server error', e.message, '500'),
       );
     }
   }

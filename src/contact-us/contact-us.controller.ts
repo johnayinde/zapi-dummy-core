@@ -5,23 +5,35 @@ import {
   TopicResponseDto,
 } from './dto';
 import { ContactUsService } from './contact-us.service';
+import { ApiOperation } from '@nestjs/swagger';
+import { Ok, ZapiResponse } from 'src/common/helpers/response';
 
 @Controller('contact-us')
 export class ContactUsController {
   constructor(private ContactUs: ContactUsService) {}
 
   @Get()
-  getCountries(): CountryResponseDto[] {
-    return this.ContactUs.getCountries();
+  @ApiOperation({ summary: 'Get all topics' })
+  async getAllTopics(): Promise<Ok<TopicResponseDto[]>> {
+    const topics = this.ContactUs.getTopics();
+    return ZapiResponse.Ok(topics, 'Ok', '200');
   }
 
   @Get()
-  getTopics(): TopicResponseDto[] {
-    return this.ContactUs.getTopics();
+  @ApiOperation({ summary: 'Get all countries' })
+  async getAllCountries(): Promise<Ok<CountryResponseDto[]>> {
+    const topics = this.ContactUs.getCountries();
+    return ZapiResponse.Ok(topics, 'Ok', '200');
   }
 
   @Post()
-  createContactUs(@Body() payload: CreateContactFormDto) {
-    return this.ContactUs.createContactUs(payload);
+  @ApiOperation({ summary: 'Add a new contact details' })
+  async addContactUsDetails(@Body() payload: CreateContactFormDto) {
+    const contactUsDetails = await this.ContactUs.createContactUs(payload);
+    return ZapiResponse.Ok(
+      contactUsDetails,
+      'Contact details added  successfully',
+      '201',
+    );
   }
 }

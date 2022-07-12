@@ -1,24 +1,10 @@
-// export const contactUs = [
-//   {
-//     contactId: '1',
-//     firstName: 'firstName',
-//     lastName: 'lastName',
-//     phoneNo: '09099999',
-//     businessEmail: 'hhh@example.com',
-//     countryId: 'AX',
-//     countryNames: 'Nigeria',
-//     companyName: 'mybusiness',
-//     topicName: 'Support',
-//     additionalInfo: 'nothing',
-//   },
-// ];
 export const helpTopics = [
-  { topicId: '1', topicName: 'How Can We Help' },
-  { topicId: '2', topicName: 'General Inquiry' },
-  { topicId: '3', topicName: 'Support' },
-  { topicId: '4', topicName: 'Sales' },
-  { topicId: '5', topicName: 'Media inquiry' },
-  { topicId: '6', topicName: 'Info on becoming An API Provider' },
+  { topicName: 'How Can We Help' },
+  { topicName: 'General Inquiry' },
+  { topicName: 'Support' },
+  { topicName: 'Sales' },
+  { topicName: 'Media inquiry' },
+  { topicName: 'Info on becoming An API Provider' },
 ];
 
 export const countries = [

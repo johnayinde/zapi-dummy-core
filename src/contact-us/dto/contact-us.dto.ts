@@ -15,18 +15,12 @@ export class ContactFormDto {
   @IsEmail()
   @IsNotEmpty()
   businessEmail: string;
-  // @IsNotEmpty()
-  // @IsString()
-  // countryId: string;
   @IsNotEmpty()
   @IsString()
   countryNames: string;
   @IsNotEmpty()
   @IsString()
   companyName: string;
-  // @IsNotEmpty()
-  // @IsString()
-  // topicId: string;
   @IsNotEmpty()
   @IsString()
   topicName: string;
@@ -49,9 +43,6 @@ export class CreateContactFormDto {
   businessEmail: string;
   @IsNotEmpty()
   @IsString()
-  // countryId: string;
-  // @IsNotEmpty()
-  // @IsString()
   countryNames: string;
   @IsNotEmpty()
   @IsString()
@@ -65,9 +56,6 @@ export class CreateContactFormDto {
 }
 
 export class TopicResponseDto {
-  // @IsNotEmpty()
-  // @IsString()
-  // topicId: string;
   @IsNotEmpty()
   @IsString()
   topicName: string;
