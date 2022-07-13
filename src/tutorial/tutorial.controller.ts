@@ -21,8 +21,10 @@ export class TutorialController{
 
     @ApiOperation({summary: 'Create tutorial'})
     @Post()
-    async createTutorial(@Body() tutorialDto: TutorialDto){
-        const tutorial = await this.tutorialService.createTutorial(tutorialDto)
+    async createTutorial(
+        @Body() tutorialDto: TutorialDto,
+        @Param('apiId') apiId: string,){
+        const tutorial = await this.tutorialService.createTutorial(tutorialDto, apiId)
         return ZapiResponse.Ok(tutorial, "Tutorial created", 201)
     }
 
