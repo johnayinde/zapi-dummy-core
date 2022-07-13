@@ -8,6 +8,4 @@ export class UpdateTutorialDto {
     @ApiPropertyOptional()
     body: string;
 
-    @ApiPropertyOptional()
-    apiId: string
 }

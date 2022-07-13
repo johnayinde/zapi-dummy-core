@@ -11,7 +11,4 @@ export class TutorialDto {
     @ApiProperty()
     body: string;
 
-    @IsNotEmpty()
-    @ApiProperty()
-    apiId: string
 }
