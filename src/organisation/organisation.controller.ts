@@ -119,4 +119,11 @@ export class OrganisationController {
     );
     return ZapiResponse.Ok(updatedOrganisation, 'Organisation updated', '200');
   }
+
+  @Get('/users-org/:id')
+  @ApiOperation({ summary: 'Get all Organisation a user belongs to' })
+  async getUserOrganisations(@Param('id') id: string) {
+    const users = await this.orgService.findUserOrgs(id);
+    return ZapiResponse.Ok(users, 'User Organisation', '200');
+  }
 }

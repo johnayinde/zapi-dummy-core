@@ -391,4 +391,19 @@ export class OrganisationService {
       return await this.findOrganisationById(id);
     }
   }
+
+  /**find users by organisation id
+   * @Param - profileId: string  -id: string
+   * @returns a promise of profileOrg[], throws an error if id does not exist
+   * */
+  async findUserOrgs(profileId: string): Promise<Organisation[]> {
+    const users = await this.profileOrgRepo.find({
+      where: { profileId },
+    });
+    return Promise.all(
+      users.map((proofilOrg) =>
+        this.orgRepo.findOne({ where: { id: proofilOrg.organisationId } }),
+      ),
+    );
+  }
 }
