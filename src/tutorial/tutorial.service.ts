@@ -21,13 +21,15 @@ export class TutorialService{
      * returns the tutorial title if successful
      * returns an error if unsuccessful
      */
-    async createTutorial(tutorialDto: TutorialDto) : Promise<Tutorial>{
+    async createTutorial(
+        tutorialDto: TutorialDto, 
+        apiId: string) : Promise<Tutorial>{
         //check if api exists
-        const apiExists = await this.apiRepo.findOneBy({id: tutorialDto.apiId})
+        const apiExists = await this.apiRepo.findOneBy({id: apiId})
         // return error if api does not exists
         if(!apiExists){
             throw new BadRequestException(
-                ZapiResponse.NotFoundRequest(`Api with id : ${tutorialDto.apiId} does not exists`)
+                ZapiResponse.NotFoundRequest(`Api with id : ${apiId} does not exists`)
             )
         }
         
