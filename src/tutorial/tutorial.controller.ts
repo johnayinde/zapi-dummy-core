@@ -16,14 +16,14 @@ export class TutorialController{
     @Get("/:tutorialId")
     async findTutorialById(@Param('tutorialId') tutorialId: string){
         const tutorial = await this.tutorialService.getSingleTutorial(tutorialId)
-        return ZapiResponse.Ok(tutorial.title,"Tutorial", 200)
+        return ZapiResponse.Ok(tutorial,"Tutorial", 200)
     }
 
     @ApiOperation({summary: 'Create tutorial'})
-    @Post()
+    @Post('/:apiId')
     async createTutorial(
-        @Body() tutorialDto: TutorialDto,
-        @Param('apiId') apiId: string,){
+        @Param('apiId') apiId: string,
+        @Body() tutorialDto: TutorialDto){
         const tutorial = await this.tutorialService.createTutorial(tutorialDto, apiId)
         return ZapiResponse.Ok(tutorial, "Tutorial created", 201)
     }
