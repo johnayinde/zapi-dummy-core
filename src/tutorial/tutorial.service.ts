@@ -23,20 +23,30 @@ export class TutorialService{
      */
     async createTutorial(
         tutorialDto: TutorialDto, 
-        apiId: string) : Promise<Tutorial>{
-        //check if api exists
-        const apiExists = await this.apiRepo.findOneBy({id: apiId})
-        // return error if api does not exists
-        if(!apiExists){
-            throw new BadRequestException(
-                ZapiResponse.NotFoundRequest(`Api with id : ${apiId} does not exists`)
-            )
-        }
+        apiId : string) : Promise<any>{
         
         try{
+            //check if api existsApi
+            const apiExists = await this.apiRepo.findOneBy({id: apiId})
+            
+            // return error if api does not exists
+            if(!apiExists){
+                throw new BadRequestException(
+                    ZapiResponse.NotFoundRequest(`Api with id : ${apiId} does not exists`, "400")
+                )
+            }
+
+            // create tutorial object
+            const newTutorial = {
+                title: tutorialDto.title,
+                body: tutorialDto.body,
+                apiId: apiId}
+                
             // save tutorial to database
-            const tutorial = await this.tutorialRepo.save(tutorialDto)
-            return tutorial
+            const savedTutorial = await this.tutorialRepo.save(newTutorial)
+            
+            return savedTutorial
+
         }catch(err){
             throw new BadRequestException(
                 ZapiResponse.BadRequest("Error creating tutorial", "500", err.message)
