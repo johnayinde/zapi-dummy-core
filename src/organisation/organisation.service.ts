@@ -106,7 +106,7 @@ export class OrganisationService {
    * */
   async findOrganisationById(id: string): Promise<Organisation> {
     const org = await this.orgRepo.findOne({ where: { id } });
-    if (org === undefined) {
+    if (!org) {
       throw new NotFoundException(
         ZapiResponse.NotFoundRequest(
           'No Found',
@@ -127,7 +127,7 @@ export class OrganisationService {
     const profile = await this.profileRepo.findOne({
       where: { id: profileId },
     });
-    if (profile === undefined) {
+    if (!profile) {
       throw new NotFoundException(
         ZapiResponse.NotFoundRequest(
           'No Found',
@@ -147,7 +147,7 @@ export class OrganisationService {
     const profile = await this.profileRepo.findOne({
       where: { email: userEmail },
     });
-    if (profile === undefined) {
+    if (!profile) {
       throw new NotFoundException(
         ZapiResponse.NotFoundRequest(
           'No Found',
@@ -318,7 +318,7 @@ export class OrganisationService {
     const user = await this.profileOrgRepo.findOne({
       where: { profileId: profileId, organisationId: id },
     });
-    if (user === undefined) {
+    if (!user) {
       throw new NotFoundException(
         ZapiResponse.NotFoundRequest('Not Found', 'User not Found', '404'),
       );
