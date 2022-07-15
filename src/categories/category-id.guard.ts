@@ -25,13 +25,14 @@ export class CategoryIdGuard implements CanActivate {
       'categories',
       context.getHandler(),
     );
-    if (!categories) {
-      return true;
-    }
+
     const request = context.switchToHttp().getRequest();
     const categoryId = request.params.categoryId;
 
-    return this.confirmCategoryId(categoryId);
+    // match categoryId with categories
+    if (categories.includes(categoryId)) {
+      return this.confirmCategoryId(categoryId);
+    }
   }
 
   async confirmCategoryId(categoryId: string) {
