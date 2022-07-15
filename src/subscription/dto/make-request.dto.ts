@@ -7,11 +7,11 @@ export class SubscriptionApiCallDto {
   @ApiProperty()
   method: HttpMethod;
 
-  @IsNotEmpty()
+  
   @ApiProperty()
   route: string;
 
-  @IsNotEmpty()
+ 
   @ApiProperty()
   payload: Object;
 

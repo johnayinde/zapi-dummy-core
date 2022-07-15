@@ -188,7 +188,7 @@ export class SubscriptionService {
         throw new UnauthorizedException(
           ZapiResponse.BadRequest(
             'Subscription Error',
-            "User's subscription has expired",
+            "User's subscription has expired or is not subscribed to this api",
             '403',
           ),
         );
@@ -219,12 +219,11 @@ export class SubscriptionService {
     }
     // we need too check that the name, data type and requirements foe each property in the
     //endpoints.payload are met explicitly
+    
     const base_url = api.base_url;
     const endRoute = endpoint.route;
     const endMethod = endpoint.method.toLowerCase();
-
     const url = base_url + `${endRoute}`;
-
     const p = this.httpService.axiosRef;
     const axiosResponse = await p({
       method: endMethod,
