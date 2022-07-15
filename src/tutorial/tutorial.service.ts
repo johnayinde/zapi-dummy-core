@@ -17,9 +17,7 @@ export class TutorialService{
     ){}
 
     /**
-     * Assigns a tutorial to an api
-     * returns the tutorial title if successful
-     * returns an error if unsuccessful
+     * create tutorial for an api
      */
     async createTutorial(
         tutorialDto: TutorialDto, 
@@ -32,7 +30,9 @@ export class TutorialService{
             // return error if api does not exists
             if(!apiExists){
                 throw new BadRequestException(
-                    ZapiResponse.NotFoundRequest(`Api not found`, "400")
+                    ZapiResponse.NotFoundRequest(
+                        `Api not found`, 
+                        "400")
                 )
             }
 
@@ -42,14 +42,16 @@ export class TutorialService{
                 body: tutorialDto.body,
                 apiId: apiId}
                 
-            // save tutorial to database
-            const savedTutorial = await this.tutorialRepo.save(newTutorial)
-            
-            return savedTutorial
+            // create and save tutorial to database
+            const savedTutorial = await this.tutorialRepo.create(newTutorial)
+            return await this.tutorialRepo.save(savedTutorial)
 
         }catch(err){
             throw new BadRequestException(
-                ZapiResponse.BadRequest(err.message, "Error creating tutorial", "500",)
+                ZapiResponse.BadRequest(
+                    "Error creating tutorial", 
+                    err.message, 
+                    "500",)
                 )
             }
         }
@@ -63,7 +65,9 @@ export class TutorialService{
         //return error if tustorial does not exist
         if(!tutorialExists){
             throw new BadRequestException(
-                ZapiResponse.NotFoundRequest("Tutorial does not exists", "404")
+                ZapiResponse.NotFoundRequest(
+                    "Tutorial does not exists", 
+                    "404")
             )
         }
         //delete tutorial if it exists
@@ -71,7 +75,10 @@ export class TutorialService{
             await this.tutorialRepo.delete({id: tutorialId})
             return {message: "Tutorial deleted"}
         }catch(err){
-            ZapiResponse.OkFailure( err.message, "Error deleting tutorial", "500")
+            ZapiResponse.OkFailure(
+                "Error deleting tutorial", 
+                err.message, 
+                "500")
         }
     }
 
@@ -84,7 +91,9 @@ export class TutorialService{
         // throw error if tutorial not found
         if(!tutorial){
             throw new BadRequestException(
-                ZapiResponse.NotFoundRequest("Tutorial not found", "404")
+                ZapiResponse.NotFoundRequest(
+                    "Tutorial not found", 
+                    "404")
             )
         }
         return tutorial
@@ -101,7 +110,9 @@ export class TutorialService{
         // return error if api or tutorial does not exists
         if(!apiExists || !tutorialExists){
             throw new BadRequestException(
-                ZapiResponse.NotFoundRequest(`Api w or Tutorial does not exists`, "404")
+                ZapiResponse.NotFoundRequest(
+                    `Api or Tutorial does not exists`, 
+                    "404")
             )
         } 
         //update tutorial
@@ -109,7 +120,9 @@ export class TutorialService{
 
         if(!updatedTutorial){
             throw new BadRequestException(
-                ZapiResponse.NotFoundRequest("Tutorial not updated", "500")
+                ZapiResponse.NotFoundRequest(
+                    "Tutorial not updated", 
+                    "500")
             )
         }
 
