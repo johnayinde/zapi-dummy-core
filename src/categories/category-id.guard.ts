@@ -5,19 +5,29 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ZapiResponse } from 'src/common/helpers/response';
 import { Category } from 'src/entities/category.entity';
 import { Repository } from 'typeorm';
+// import { CategoryDecoratorParams } from 'src/common/decorators/categories.decorator';
 
 @Injectable()
 export class CategoryIdGuard implements CanActivate {
   constructor(
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
+    private reflector: Reflector,
   ) {}
 
   canActivate(context: ExecutionContext) {
+    const categories = this.reflector.get<string[]>(
+      'categories',
+      context.getHandler(),
+    );
+    if (!categories) {
+      return true;
+    }
     const request = context.switchToHttp().getRequest();
     const categoryId = request.params.categoryId;
 

@@ -17,6 +17,7 @@ import { Category } from '../entities/category.entity';
 import { CreateCategoriesDto } from './dto/categories.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CategoryIdGuard } from './category-id.guard';
+import { Categories } from 'src/common/decorators/categories.decorator';
 
 @ApiTags('Categories')
 @Controller('categories')
@@ -56,7 +57,7 @@ export class CategoryController {
   }
 
   @Get('/test/:categoryId')
-  @UseGuards(CategoryIdGuard)
+  @Categories('category')
   async createCategoryId() {
     return 'testing';
   }
