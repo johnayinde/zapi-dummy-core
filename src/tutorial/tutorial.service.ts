@@ -23,16 +23,16 @@ export class TutorialService{
      */
     async createTutorial(
         tutorialDto: TutorialDto, 
-        apiId : string) : Promise<any>{
+        apiId : string) : Promise<Tutorial>{
         
         try{
-            //check if api existsApi
-            const apiExists = await this.apiRepo.findOneBy({id: apiId})
+            //check if api exists
+            const apiExists = await this.apiRepo.findOne({where : {id : apiId}})
             
             // return error if api does not exists
             if(!apiExists){
                 throw new BadRequestException(
-                    ZapiResponse.NotFoundRequest(`Api with id : ${apiId} does not exists`, "400")
+                    ZapiResponse.NotFoundRequest(`Api not found`, "400")
                 )
             }
 
@@ -49,7 +49,7 @@ export class TutorialService{
 
         }catch(err){
             throw new BadRequestException(
-                ZapiResponse.BadRequest("Error creating tutorial", "500", err.message)
+                ZapiResponse.BadRequest(err.message, "Error creating tutorial", "500",)
                 )
             }
         }
@@ -59,11 +59,11 @@ export class TutorialService{
      */
     async deleteTutorial(tutorialId: string) : Promise<Object>{
         // check if tutorial exists
-        const tutorialExists = await this.tutorialRepo.findOneBy({id:tutorialId})
+        const tutorialExists = await this.tutorialRepo.findOne({where : {id:tutorialId}})
         //return error if tustorial does not exist
         if(!tutorialExists){
             throw new BadRequestException(
-                ZapiResponse.NotFoundRequest("Tutorial does not exists")
+                ZapiResponse.NotFoundRequest("Tutorial does not exists", "404")
             )
         }
         //delete tutorial if it exists
@@ -71,7 +71,7 @@ export class TutorialService{
             await this.tutorialRepo.delete({id: tutorialId})
             return {message: "Tutorial deleted"}
         }catch(err){
-            ZapiResponse.OkFailure("Error deleting tutorial", "500", err.message)
+            ZapiResponse.OkFailure( err.message, "Error deleting tutorial", "500")
         }
     }
 
@@ -80,11 +80,11 @@ export class TutorialService{
      */
     async getSingleTutorial(tutorialId: string) : Promise<Tutorial>{
         // find tutorial 
-        const tutorial = await this.tutorialRepo.findOneBy({id: tutorialId})
+        const tutorial = await this.tutorialRepo.findOne({where: {id: tutorialId}})
         // throw error if tutorial not found
         if(!tutorial){
             throw new BadRequestException(
-                ZapiResponse.NotFoundRequest("Tutorial not found")
+                ZapiResponse.NotFoundRequest("Tutorial not found", "404")
             )
         }
         return tutorial
@@ -95,13 +95,13 @@ export class TutorialService{
         tutorialId: string, 
         updateTutorialDto: UpdateTutorialDto) : Promise<Tutorial>{
         //check if api exists
-        const apiExists = await this.apiRepo.findOneBy({id: apiId})
+        const apiExists = await this.apiRepo.findOne({where : {id: apiId}})
         //check if tutorial exists
-        const tutorialExists = await this.tutorialRepo.findOneBy({id: tutorialId})
+        const tutorialExists = await this.tutorialRepo.findOne({where : {id: tutorialId}})
         // return error if api or tutorial does not exists
         if(!apiExists || !tutorialExists){
             throw new BadRequestException(
-                ZapiResponse.NotFoundRequest(`Api with id : ${apiId} or Tutorial with id : ${tutorialId} does not exists`)
+                ZapiResponse.NotFoundRequest(`Api w or Tutorial does not exists`, "404")
             )
         } 
         //update tutorial
