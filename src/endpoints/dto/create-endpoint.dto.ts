@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsArray, IsObject } from 'class-validator';
 import { HttpMethod } from '../../common/enums/httpMethods.enum';
 
@@ -25,7 +25,9 @@ export class CreateEndpointDto {
     required: boolean;
   }[];
 
-  @IsObject()
-  @ApiProperty()
-  requestBody: { format: string; body: string };
+  @IsArray()
+  @ApiPropertyOptional()
+  requestBody: [
+    { name: string; data_type: any }
+  ]
 }
