@@ -204,7 +204,11 @@ export class SubscriptionService {
     }
   }
 
-  async makeSubscriptionRequest(token: string, body: SubscriptionApiCallDto) {
+  async makeSubscriptionRequest(
+    token: string,
+    body: SubscriptionApiCallDto,
+    uniqueApiSecurityKey: string | string[],
+  ) {
     const { api, profile } = await this.verifySub(token);
     const endpoint = await this.endpointRepository.findOne({
       where: {
@@ -219,7 +223,17 @@ export class SubscriptionService {
     }
     // we need too check that the name, data type and requirements foe each property in the
     //endpoints.payload are met explicitly
-    
+
+    // verify if the api secret key value is the same as the api secret
+    if (api.secretKey != uniqueApiSecurityKey) {
+      throw new UnauthorizedException(
+        ZapiResponse.BadRequest(
+          'Unauthorized',
+          'user not authorized to this api',
+          '401',
+        ),
+      );
+    }
     const base_url = api.base_url;
     const endRoute = endpoint.route;
     const endMethod = endpoint.method.toLowerCase();
@@ -238,6 +252,6 @@ export class SubscriptionService {
     const subIds = await (
       await this.subRepository.find({ where: { profileId } })
     ).map((sub) => this.apiRepository.find({ where: { id: sub.apiId } }));
-    return Promise.all(subIds)
+    return Promise.all(subIds);
   }
 }

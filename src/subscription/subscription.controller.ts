@@ -1,10 +1,11 @@
-import { Body, Controller, Post, Param, Get } from '@nestjs/common';
+import { Body, Controller, Post, Param, Get, Req } from '@nestjs/common';
 import { SubscriptionService } from './subscription.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Ok, ZapiResponse } from '../common/helpers/response';
 import { createSubscriptionDto } from './dto/create-subscription.dto';
 import { Tokens } from 'src/common/types';
 import { SubscriptionApiCallDto } from './dto/make-request.dto';
+import { Request } from 'express';
 
 @ApiTags('subscription')
 @Controller('subscription')
@@ -34,22 +35,35 @@ export class SubscriptionController {
   }
 
   @Post('api-request/:token')
-  @ApiOperation({summary: 'Check subscription status of user to the api'})
+  @ApiOperation({ summary: 'Check subscription status of user to the api' })
   async verify(
-    @Param("token") token: string,
+    @Param('token') token: string,
     @Body() subscriptionApiCall: SubscriptionApiCallDto,
-  ):Promise<Ok<Object>>{
+    @Req() request: Request,
+  ): Promise<Ok<Object>> {
     // const verifySubscription = await this.subscriptionService.verifySub(verifysub)
-    const verifySubscription = await this.subscriptionService.makeSubscriptionRequest(token, subscriptionApiCall)
-    return ZapiResponse.Ok(verifySubscription, 'user is subcribed to this api', '200')
+
+    // Get the secret key from the request header "Api-Secret-Key"
+    const uniqueApiSecurityKey = request.headers['api-secret-key'];
+    const verifySubscription =
+      await this.subscriptionService.makeSubscriptionRequest(
+        token,
+        subscriptionApiCall,
+        uniqueApiSecurityKey,
+      );
+    return ZapiResponse.Ok(
+      verifySubscription,
+      'user is subcribed to this api',
+      '200',
+    );
   }
 
   @Get(':profileId/all')
-  @ApiOperation({summary: 'Get all apis a user is subscribed to'})
-  async getAllSubscriptions(
-    @Param("profileId") profileId: string,
-  ){
-    const subscriptions = await this.subscriptionService.getAllSubscriptions(profileId);
-    return ZapiResponse.Ok(subscriptions, 'User Subscriptions')
+  @ApiOperation({ summary: 'Get all apis a user is subscribed to' })
+  async getAllSubscriptions(@Param('profileId') profileId: string) {
+    const subscriptions = await this.subscriptionService.getAllSubscriptions(
+      profileId,
+    );
+    return ZapiResponse.Ok(subscriptions, 'User Subscriptions');
   }
 }

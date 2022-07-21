@@ -56,6 +56,9 @@ export class Api extends SharedEntity {
   @Column()
   profileId: string;
 
+  @Column()
+  secretKey: string;
+
   @Column({ nullable: true })
   tutorialsId: string;
 
