@@ -43,13 +43,10 @@ export class SubscriptionController {
   ): Promise<Ok<Object>> {
     // const verifySubscription = await this.subscriptionService.verifySub(verifysub)
 
-    // Get the secret key from the request header "Api-Secret-Key"
-    const uniqueApiSecurityKey = request.headers['api-secret-key'];
     const verifySubscription =
       await this.subscriptionService.makeSubscriptionRequest(
         token,
         subscriptionApiCall,
-        uniqueApiSecurityKey,
       );
     return ZapiResponse.Ok(
       verifySubscription,

@@ -204,11 +204,7 @@ export class SubscriptionService {
     }
   }
 
-  async makeSubscriptionRequest(
-    token: string,
-    body: SubscriptionApiCallDto,
-    uniqueApiSecurityKey: string | string[],
-  ) {
+  async makeSubscriptionRequest(token: string, body: SubscriptionApiCallDto) {
     const { api, profile } = await this.verifySub(token);
     const endpoint = await this.endpointRepository.findOne({
       where: {
@@ -224,16 +220,7 @@ export class SubscriptionService {
     // we need too check that the name, data type and requirements foe each property in the
     //endpoints.payload are met explicitly
 
-    // verify if the api secret key value is the same as the api secret
-    if (api.secretKey != uniqueApiSecurityKey) {
-      throw new UnauthorizedException(
-        ZapiResponse.BadRequest(
-          'Unauthorized',
-          'user not authorized to this api',
-          '401',
-        ),
-      );
-    }
+    const uniqueApiSecurityKey = api.secretKey;
     const base_url = api.base_url;
     const endRoute = endpoint.route;
     const endMethod = endpoint.method.toLowerCase();
@@ -243,6 +230,7 @@ export class SubscriptionService {
       method: endMethod,
       url: url,
       data: body.payload,
+      headers: { 'X-Zapi-Proxy-Secret': uniqueApiSecurityKey },
     });
     const data = axiosResponse.data;
     return data;
