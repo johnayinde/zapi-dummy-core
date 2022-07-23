@@ -8,7 +8,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { SubscriptionService } from './subscription.service';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Ok, ZapiResponse } from '../common/helpers/response';
 import { createSubscriptionDto } from './dto/create-subscription.dto';
 import { Tokens } from 'src/common/types';
@@ -42,6 +42,7 @@ export class SubscriptionController {
   }
 
   @Post('api-request')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Check subscription status of user to the api' })
   async verify(
     @Headers('Authorization') authorization,
