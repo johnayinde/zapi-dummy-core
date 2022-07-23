@@ -1,4 +1,12 @@
-import { Body, Controller, Post, Param, Get } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Param,
+  Get,
+  Headers,
+  BadRequestException,
+} from '@nestjs/common';
 import { SubscriptionService } from './subscription.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Ok, ZapiResponse } from '../common/helpers/response';
@@ -33,23 +41,38 @@ export class SubscriptionController {
     return ZapiResponse.Ok(subscription, 'Unsubscribed Successfully', '200');
   }
 
-  @Post('api-request/:token')
-  @ApiOperation({summary: 'Check subscription status of user to the api'})
+  @Post('api-request')
+  @ApiOperation({ summary: 'Check subscription status of user to the api' })
   async verify(
-    @Param("token") token: string,
+    @Headers('Authorization') authorization,
     @Body() subscriptionApiCall: SubscriptionApiCallDto,
-  ):Promise<Ok<Object>>{
-    // const verifySubscription = await this.subscriptionService.verifySub(verifysub)
-    const verifySubscription = await this.subscriptionService.makeSubscriptionRequest(token, subscriptionApiCall)
-    return ZapiResponse.Ok(verifySubscription, 'user is subcribed to this api', '200')
+  ): Promise<Ok<Object>> {
+    // const verifySubscreqiption = await this.subscriptionService.verifySub(verifysub)
+    if (!authorization) {
+      throw new BadRequestException(
+        ZapiResponse.BadRequest('No Bearer Token', 'No Token provided', '403'),
+      );
+    }
+    const token = authorization.split(' ')[1];
+
+    const verifySubscription =
+      await this.subscriptionService.makeSubscriptionRequest(
+        token,
+        subscriptionApiCall,
+      );
+    return ZapiResponse.Ok(
+      verifySubscription,
+      'user is subcribed to this api',
+      '200',
+    );
   }
 
   @Get(':profileId/all')
-  @ApiOperation({summary: 'Get all apis a user is subscribed to'})
-  async getAllSubscriptions(
-    @Param("profileId") profileId: string,
-  ){
-    const subscriptions = await this.subscriptionService.getAllSubscriptions(profileId);
-    return ZapiResponse.Ok(subscriptions, 'User Subscriptions')
+  @ApiOperation({ summary: 'Get all apis a user is subscribed to' })
+  async getAllSubscriptions(@Param('profileId') profileId: string) {
+    const subscriptions = await this.subscriptionService.getAllSubscriptions(
+      profileId,
+    );
+    return ZapiResponse.Ok(subscriptions, 'User Subscriptions');
   }
 }
