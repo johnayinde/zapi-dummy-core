@@ -54,11 +54,11 @@ export class SubscriptionController {
         ZapiResponse.BadRequest('No Bearer Token', 'No Token provided', '403'),
       );
     }
-    const token = authorization.split(' ')[1];
+    const xZapiAuthToken = authorization.split(' ')[1];
 
     const verifySubscription =
       await this.subscriptionService.makeSubscriptionRequest(
-        token,
+        xZapiAuthToken,
         subscriptionApiCall,
       );
     return ZapiResponse.Ok(
