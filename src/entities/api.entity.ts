@@ -56,7 +56,7 @@ export class Api extends SharedEntity {
   @Column()
   profileId: string;
 
-  @Column()
+  @Column({ nullable: true })
   secretKey: string;
 
   @Column({ nullable: true })
