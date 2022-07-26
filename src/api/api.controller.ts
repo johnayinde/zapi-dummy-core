@@ -6,7 +6,7 @@ import {
   Param,
   Delete,
   Query,
-  Put,
+  Patch,
 } from '@nestjs/common';
 import { ApiService } from './api.service';
 import { CreateApiDto } from './dto/create-api.dto';
@@ -16,6 +16,7 @@ import { Ok } from 'src/common/helpers/response/ResponseType';
 import { Api } from '../entities/api.entity';
 import { CustomFindDto } from './dto/customFind.dto';
 import { UpdateApiDto } from './dto/update-api.dto';
+import { Paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
 
 @ApiTags('Apis')
 @Controller('api')
@@ -33,12 +34,12 @@ export class ApiController {
     return ZapiResponse.Ok(api, 'Api Created', '201');
   }
 
-  /* This is a get request that returns all the apis. */
+  /* This is a get request that takes in a query and returns a promise of a paginated Api. */
   @Get()
-  @ApiOperation({ summary: 'Get all apis' })
-  async findAll() {
-    const apis = await this.apiService.findAll();
-    return ZapiResponse.Ok(apis, 'Ok', '200');
+  @ApiOperation({ summary: 'Get or search all apis' })
+  async findAll(@Paginate() query: PaginateQuery): Promise<Ok<Paginated<Api>>> {
+    const result = await this.apiService.findAll(query);
+    return ZapiResponse.Ok(result, 'Ok', '200');
   }
 
   /* This is a get request that takes in an id and returns the api that matches the Id */
@@ -58,7 +59,7 @@ export class ApiController {
 
   /* A put request that takes in an apiId, profileId, and a body and returns a promise of an
   UpdateResult. */
-  @Put(':apiId')
+  @Patch(':apiId')
   @ApiOperation({ summary: 'Update api' })
   async update(
     @Param('apiId') apiId: string,
