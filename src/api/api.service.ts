@@ -9,6 +9,12 @@ import { Api } from '../entities/api.entity';
 import { Repository } from 'typeorm';
 import { CreateApiDto } from './dto/create-api.dto';
 import { UpdateApiDto } from './dto/update-api.dto';
+import {
+  FilterOperator,
+  PaginateQuery,
+  paginate,
+  Paginated,
+} from 'nestjs-paginate';
 import { v4 as uuid } from 'uuid';
 
 /* The ApiService class is a service that uses the APiRepository class to do crud operation */
@@ -53,12 +59,23 @@ export class ApiService {
   }
 
   /**
-   * Find all the apis in the database and return them as an array of Api objects.
-   * @returns An array of Api objects.
+   * It takes a query object, and returns a paginated result of the Api model
+   * @param {PaginateQuery} query - PaginateQuery - This is the query object that is passed to the
+   * service.
+   * @returns Paginated<Api>
    */
-  async findAll(): Promise<Api[]> {
+  async findAll(query: PaginateQuery): Promise<Paginated<Api>> {
     try {
-      return await this.apiRepository.find();
+      return paginate(query, this.apiRepository, {
+        sortableColumns: ['createdOn', 'name'],
+        searchableColumns: ['name', 'description', 'about'],
+        defaultSortBy: [['id', 'DESC']],
+        filterableColumns: {
+          category: [FilterOperator.IN],
+          status: [FilterOperator.IN],
+          rating: [FilterOperator.GTE, FilterOperator.LTE],
+        },
+      });
     } catch (error) {
       throw new BadRequestException(
         ZapiResponse.BadRequest('Internal Server error', error.message, '500'),
