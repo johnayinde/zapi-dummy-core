@@ -45,16 +45,16 @@ export class SubscriptionController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Check subscription status of user to the api' })
   async verify(
-    @Headers('Authorization') authorization,
+    @Headers('X-ZAPI-AUTH-TOKEN') xZapiAuth,
     @Body() subscriptionApiCall: SubscriptionApiCallDto,
   ): Promise<Ok<Object>> {
     // const verifySubscreqiption = await this.subscriptionService.verifySub(verifysub)
-    if (!authorization) {
+    if (!xZapiAuth) {
       throw new BadRequestException(
-        ZapiResponse.BadRequest('No Bearer Token', 'No Token provided', '403'),
+        ZapiResponse.BadRequest('No Token', 'No Token provided', '403'),
       );
     }
-    const xZapiAuthToken = authorization.split(' ')[1];
+    const xZapiAuthToken = xZapiAuth;
 
     const verifySubscription =
       await this.subscriptionService.makeSubscriptionRequest(
