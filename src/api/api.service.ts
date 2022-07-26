@@ -15,6 +15,7 @@ import {
   paginate,
   Paginated,
 } from 'nestjs-paginate';
+import { v4 as uuid } from 'uuid';
 
 /* The ApiService class is a service that uses the APiRepository class to do crud operation */
 @Injectable()
@@ -40,9 +41,13 @@ export class ApiService {
         );
       }
 
+      // Generate a unique UUID string as the api secret key
+      const uniqueApiSecurityKey = uuid();
+
       const newApi = this.apiRepository.create({
         ...createApiDto,
         profileId,
+        secretKey: uniqueApiSecurityKey,
       });
 
       return await this.apiRepository.save(newApi);
