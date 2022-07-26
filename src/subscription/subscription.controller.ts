@@ -1,6 +1,14 @@
-import { Body, Controller, Post, Param, Get, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Param,
+  Get,
+  Headers,
+  BadRequestException,
+} from '@nestjs/common';
 import { SubscriptionService } from './subscription.service';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Ok, ZapiResponse } from '../common/helpers/response';
 import { createSubscriptionDto } from './dto/create-subscription.dto';
 import { Tokens } from 'src/common/types';
@@ -34,18 +42,24 @@ export class SubscriptionController {
     return ZapiResponse.Ok(subscription, 'Unsubscribed Successfully', '200');
   }
 
-  @Post('api-request/:token')
+  @Post('api-request')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Check subscription status of user to the api' })
   async verify(
-    @Param('token') token: string,
+    @Headers('X-ZAPI-AUTH-TOKEN') xZapiAuth,
     @Body() subscriptionApiCall: SubscriptionApiCallDto,
-    @Req() request: Request,
   ): Promise<Ok<Object>> {
-    // const verifySubscription = await this.subscriptionService.verifySub(verifysub)
+    // const verifySubscreqiption = await this.subscriptionService.verifySub(verifysub)
+    if (!xZapiAuth) {
+      throw new BadRequestException(
+        ZapiResponse.BadRequest('No Token', 'No Token provided', '403'),
+      );
+    }
+    const xZapiAuthToken = xZapiAuth;
 
     const verifySubscription =
       await this.subscriptionService.makeSubscriptionRequest(
-        token,
+        xZapiAuthToken,
         subscriptionApiCall,
       );
     return ZapiResponse.Ok(
