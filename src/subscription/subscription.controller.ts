@@ -13,6 +13,7 @@ import { Ok, ZapiResponse } from '../common/helpers/response';
 import { createSubscriptionDto } from './dto/create-subscription.dto';
 import { Tokens } from 'src/common/types';
 import { SubscriptionApiCallDto } from './dto/make-request.dto';
+import { Request } from 'express';
 
 @ApiTags('subscription')
 @Controller('subscription')

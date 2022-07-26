@@ -219,7 +219,8 @@ export class SubscriptionService {
     }
     // we need too check that the name, data type and requirements foe each property in the
     //endpoints.payload are met explicitly
-    
+
+    const uniqueApiSecurityKey = api.secretKey;
     const base_url = api.base_url;
     const endRoute = endpoint.route;
     const endMethod = endpoint.method.toLowerCase();
@@ -229,6 +230,7 @@ export class SubscriptionService {
       method: endMethod,
       url: url,
       data: body.payload,
+      headers: { 'X-Zapi-Proxy-Secret': uniqueApiSecurityKey },
     });
     const data = axiosResponse.data;
     return data;
@@ -238,6 +240,6 @@ export class SubscriptionService {
     const subIds = await (
       await this.subRepository.find({ where: { profileId } })
     ).map((sub) => this.apiRepository.find({ where: { id: sub.apiId } }));
-    return Promise.all(subIds)
+    return Promise.all(subIds);
   }
 }
