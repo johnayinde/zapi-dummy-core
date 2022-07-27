@@ -37,9 +37,8 @@ export class ApiController {
   /* This is a get request that takes in a query and returns a promise of a paginated Api. */
   @Get()
   @ApiOperation({ summary: 'Get or search all apis' })
-  async findAll(@Paginate() query: PaginateQuery): Promise<Ok<Paginated<Api>>> {
-    const result = await this.apiService.findAll(query);
-    return ZapiResponse.Ok(result, 'Ok', '200');
+  async findAll(@Paginate() query: PaginateQuery): Promise<Paginated<Api>> {
+    return await this.apiService.findAll(query);
   }
 
   /* This is a get request that takes in an id and returns the api that matches the Id */
