@@ -6,6 +6,7 @@ import {
   Get,
   Patch,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { EndpointsService } from './endpoints.service';
 import { CreateEndpointDto } from './dto/create-endpoint.dto';
@@ -13,6 +14,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Endpoint } from '../entities/endpoint.entity';
 import { Ok, ZapiResponse } from 'src/common/helpers/response';
 import { UpdateEndpointDto } from './dto/update-endpoint.dto';
+import { IdCheckGuard } from 'src/common/guards/idcheck.guard';
 
 @ApiTags('Endpoints')
 @Controller('endpoints')
@@ -21,6 +23,7 @@ export class EndpointsController {
 
   /* This is a post request that takes in a body and returns a promise of an Api */
   @Post('new/:apiId')
+  @UseGuards(IdCheckGuard)
   @ApiOperation({ summary: 'Add a new endpoint' })
   async create(
     @Param('apiId') apiId: string,
@@ -43,6 +46,7 @@ export class EndpointsController {
 
   /* This is a get request that takes in a parameter and returns a promise of an endpoint. */
   @Get(':id')
+  @UseGuards(IdCheckGuard)
   @ApiOperation({ summary: 'Get an endpoint by Id' })
   async findOneById(@Param('id') id: string): Promise<Ok<Endpoint>> {
     const endpoint = await this.endpointsService.findOneById(id);
@@ -51,6 +55,7 @@ export class EndpointsController {
 
   /* This is a get request that takes in a parameter and returns a promise of an endpoint. */
   @Get('/single-api/:apiId')
+  @UseGuards(IdCheckGuard)
   @ApiOperation({ summary: 'Get all endpoints for an api' })
   async findAllByApiId(@Param('apiId') apiId: string): Promise<Ok<Endpoint[]>> {
     const endpoint = await this.endpointsService.getAllApiEndpoints(apiId);
@@ -59,6 +64,7 @@ export class EndpointsController {
 
   /* This is an update request that takes in an id and update Payload and returns a promise of updated endpoint. */
   @Patch(':id')
+  @UseGuards(IdCheckGuard)
   @ApiOperation({ summary: 'Update an endpoint' })
   async update(
     @Body() updateEndpointDto: UpdateEndpointDto,
@@ -70,6 +76,7 @@ export class EndpointsController {
 
   /* This is a delete request that takes in an id and returns a promise of the deleted endpoint. */
   @Delete(':id')
+  @UseGuards(IdCheckGuard)
   @ApiOperation({ summary: 'Delete an endpoint' })
   async remove(@Param('id') id: string) {
     const endpoint = await this.endpointsService.remove(id);
