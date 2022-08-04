@@ -8,7 +8,6 @@ import {
   Delete,
   Param,
   ParseUUIDPipe,
-  UseGuards
 } from '@nestjs/common';
 import { ZapiResponse } from '../common/helpers/response/Response';
 import { Ok } from 'src/common/helpers/response/ResponseType';
@@ -16,8 +15,6 @@ import { CategoryService } from './category.service';
 import { Category } from '../entities/category.entity';
 import { CreateCategoriesDto } from './dto/categories.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { IdCheckGuard } from 'src/common/guards/idcheck.guard';
-
 
 @ApiTags('Categories')
 @Controller('categories')
@@ -43,7 +40,6 @@ export class CategoryController {
   }
 
   @Delete(':id')
-  @UseGuards(IdCheckGuard)
   @ApiOperation({summary:'Deletes a single category with the matched id'})
   async deleteCategogry(@Param('id', new ParseUUIDPipe()) id: string) {
     const category = await this.categoryservice.deleteCategogry(id);
@@ -51,7 +47,6 @@ export class CategoryController {
   }
 
   @Get(':id')
-  @UseGuards(IdCheckGuard)
   @ApiOperation({summary:'Fetches a single category with the matched id'})
   async findOneById(@Param('id', new ParseUUIDPipe()) id: string) {
     const category = await this.categoryservice.findOneById(id);

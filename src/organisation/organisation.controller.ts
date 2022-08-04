@@ -24,7 +24,6 @@ export class OrganisationController {
 
   @ApiOperation({ summary: 'Create an organisations' })
   @Post('/:profileId/create')
-  @UseGuards(IdCheckGuard)
   async createNewOrganisation(
     @Body() organisationDto: OrganisationDto,
     @Param('profileId') profileId: string,
@@ -37,7 +36,6 @@ export class OrganisationController {
   }
 
   @Post('/:profileId/addUser/:id')
-  @UseGuards(IdCheckGuard)
   @ApiOperation({ summary: 'Add user to existing organisation' })
   async addUserToOrg(
     @Body() orgUserDto: OrgUserDto,
@@ -56,7 +54,6 @@ export class OrganisationController {
   }
 
   @Get('/:id')
-  @UseGuards(IdCheckGuard)
   @ApiOperation({ summary: 'Get one organisations' })
   async getOrganisationById(@Param('id') id: string) {
     const allOrganisation = await this.orgService.findOrganisationById(id);
@@ -64,7 +61,6 @@ export class OrganisationController {
   }
 
   @Get('/users/:id')
-  @UseGuards(IdCheckGuard)
   @ApiOperation({ summary: 'Get users of organisation' })
   async getOrgUsers(@Param('id') id: string) {
     const users = await this.orgService.findUsersByOrgId(id);
@@ -72,7 +68,6 @@ export class OrganisationController {
   }
 
   @Delete('/:profileId/delete/:id')
-  @UseGuards(IdCheckGuard)
   @ApiOperation({ summary: 'Delete an existing organisation and its users' })
   async removeOrganisation(
     @Param('id') id: string,
@@ -87,7 +82,6 @@ export class OrganisationController {
   }
 
   @Delete('/:profileId/deleteUser/:id/')
-  @UseGuards(IdCheckGuard)
   @ApiOperation({ summary: 'Delete a user from organisation' })
   async removeUser(
     @Param('id') id: string,
@@ -107,7 +101,6 @@ export class OrganisationController {
   }
 
   @Put('/:profileId/update/:id')
-  @UseGuards(IdCheckGuard)
   @ApiOperation({ summary: 'Update an existing organisation' })
   async updateOrganisation(
     @Body() updateOrganisationDto: UpdateOrganisationDto,
@@ -123,7 +116,6 @@ export class OrganisationController {
   }
 
   @Get('/users-org/:id')
-  @UseGuards(IdCheckGuard)
   @ApiOperation({ summary: 'Get all Organisation a user belongs to' })
   async getUserOrganisations(@Param('id') id: string) {
     const users = await this.orgService.findUserOrgs(id);

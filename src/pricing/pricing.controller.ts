@@ -1,6 +1,5 @@
-import { Body, Controller, Get, NotFoundException, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, Post} from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { IdCheckGuard } from 'src/common/guards/idcheck.guard';
 import { ZapiResponse } from '../common/helpers/response';
 import { PricingDto } from './dto/create-pricing.dto';
 import { PricingService } from './pricing.service';
@@ -16,7 +15,6 @@ export class PricingController {
      * Returns the api & along with the created plan 
      */
     @Post('/:apiId/basic')
-    @UseGuards(IdCheckGuard)
     @ApiOperation({summary: 'Creates Basic Pricing Plan for an API'})
     async createApiBasicPrice(@Body() pricing: PricingDto, @Param('apiId') apiId: string) {
         //the planName is hardcoded
@@ -31,7 +29,6 @@ export class PricingController {
      * Returns the api & along with the created plan 
      */
     @Post('/:apiId/pro')
-    @UseGuards(IdCheckGuard)
     @ApiOperation({summary: 'Creates Pro Pricing Plan for an API'})
     async createApiProPrice(@Body() pricing: PricingDto, @Param('apiId') apiId: string) {
         //the planName is hardcoded
@@ -46,8 +43,7 @@ export class PricingController {
      * Returns the api & along with the created plan 
      */
     @Post('/:apiId/ultra')
-    @UseGuards(IdCheckGuard)
-    @ApiOperation({summary: 'Creates Ultra Pricing Plan for an API'})
+     @ApiOperation({summary: 'Creates Ultra Pricing Plan for an API'})
     async createApiUltraPrice(@Body() pricing: PricingDto, @Param('apiId') apiId: string) {
         //the planName is hardcoded
         const planName = 'ultra';
@@ -61,8 +57,7 @@ export class PricingController {
      * Returns the api & along with the created plan 
      */
     @Post('/:apiId/mega')
-    @UseGuards(IdCheckGuard)
-    @ApiOperation({summary: 'Creates Mega Pricing Plan for an API'})
+     @ApiOperation({summary: 'Creates Mega Pricing Plan for an API'})
     async createApiMegaPrice(@Body() pricing: PricingDto, @Param('apiId') apiId: string) {
         //the planName is hardcoded
         const planName = 'mega';
@@ -75,7 +70,6 @@ export class PricingController {
      * for the specified api
      */
     @Get('/:apiId/price')
-    @UseGuards(IdCheckGuard)
     @ApiOperation({summary: 'Retrieves all the Pricing Plans for an API'})
     async getApiPrices(@Param('apiId') apiId: string) {
         const priceData = await this.pricingService.getApiPricing(apiId);

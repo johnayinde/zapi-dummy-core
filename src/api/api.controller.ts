@@ -7,7 +7,6 @@ import {
   Delete,
   Query,
   Patch,
-  UseGuards,
 } from '@nestjs/common';
 import { ApiService } from './api.service';
 import { CreateApiDto } from './dto/create-api.dto';
@@ -18,7 +17,6 @@ import { Api } from '../entities/api.entity';
 import { CustomFindDto } from './dto/customFind.dto';
 import { UpdateApiDto } from './dto/update-api.dto';
 import { Paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
-import { IdCheckGuard } from 'src/common/guards/idcheck.guard';
 
 @ApiTags('Apis')
 @Controller('api')
@@ -27,7 +25,6 @@ export class ApiController {
 
   /* This is a post request that takes in a body and returns a promise of an Api */
   @Post('new/:profileId')
-  @UseGuards(IdCheckGuard)
   @ApiOperation({ summary: 'Add a new api' })
   async create(
     @Param('profileId') profileId: string,
@@ -46,7 +43,6 @@ export class ApiController {
 
   /* This is a get request that takes in an id and returns the api that matches the Id */
   @Get(':id')
-  @UseGuards(IdCheckGuard)
   @ApiOperation({ summary: 'Get a single api by api id' })
   async findOne(@Param('id') id: string) {
     const api = await this.apiService.findOneById(id);
@@ -63,7 +59,6 @@ export class ApiController {
   /* A put request that takes in an apiId, profileId, and a body and returns a promise of an
   UpdateResult. */
   @Patch(':apiId')
-  @UseGuards(IdCheckGuard)
   @ApiOperation({ summary: 'Update api' })
   async update(
     @Param('apiId') apiId: string,
@@ -76,7 +71,6 @@ export class ApiController {
 
   /* This is a delete request that takes in an id and profileId and returns a promise of an Api. */
   @Delete(':id')
-  @UseGuards(IdCheckGuard)
   @ApiOperation({ summary: 'Delete an API' })
   async remove(@Param('id') id: string, @Query('profileId') profileId: string) {
     const api = await this.apiService.remove(id, profileId);
