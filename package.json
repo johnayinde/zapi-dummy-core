@@ -52,7 +52,8 @@
     "swagger-ui-express": "^4.4.0",
     "typeorm": "^0.3.6",
     "uuid": "^8.3.2",
-    "uuid-validate": "^0.0.3"
+    "uuid-validate": "^0.0.3",
+    "urlencode": "^1.1.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^8.0.0",
