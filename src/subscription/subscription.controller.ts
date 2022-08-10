@@ -13,7 +13,6 @@ import { Ok, ZapiResponse } from '../common/helpers/response';
 import { createSubscriptionDto } from './dto/create-subscription.dto';
 import { Tokens } from 'src/common/types';
 import { SubscriptionApiCallDto } from './dto/make-request.dto';
-import { Request } from 'express';
 
 @ApiTags('subscription')
 @Controller('subscription')
@@ -48,8 +47,7 @@ export class SubscriptionController {
   async verify(
     @Headers('X-ZAPI-AUTH-TOKEN') xZapiAuth,
     @Body() subscriptionApiCall: SubscriptionApiCallDto,
-  ): Promise<Ok<Object>> {
-    // const verifySubscreqiption = await this.subscriptionService.verifySub(verifysub)
+  ): Promise<Ok<any>> {
     if (!xZapiAuth) {
       throw new BadRequestException(
         ZapiResponse.BadRequest('No Token', 'No Token provided', '403'),

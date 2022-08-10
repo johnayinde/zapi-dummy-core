@@ -16,8 +16,7 @@ import { Repository } from 'typeorm';
 import { createSubscriptionDto } from './dto/create-subscription.dto';
 import { SubscriptionApiCallDto } from './dto/make-request.dto';
 import { HttpService } from '@nestjs/axios';
-const urlEncode = require('urlencode')
-
+import urlEncode from 'urlencode';
 
 @Injectable()
 export class SubscriptionService {
@@ -206,12 +205,14 @@ export class SubscriptionService {
     }
   }
 
-  async makeSubscriptionRequest(token: string, body: SubscriptionApiCallDto) {
-    const { api, profile } = await this.verifySub(token);
-      const encodedRoute = urlEncode(body.route)
+  async makeSubscriptionRequest(
+    token: string,
+    body: SubscriptionApiCallDto,
+  ): Promise<any> {
+    const { api } = await this.verifySub(token);
+    const encodedRoute = urlEncode(body.route);
     const endpoint = await this.endpointRepository.findOne({
       where: {
-        // apiId: api.id,
         method: body.method,
         route: encodedRoute,
       },
@@ -239,10 +240,17 @@ export class SubscriptionService {
     return data;
   }
 
-  async getAllSubscriptions(profileId) {
+  /**
+   * It gets all the subscriptions for a given profileId, then gets all the apis for each subscription,
+   * then flattens the array of arrays into a single array
+   * @param profileId - the id of the profile that is being queried
+   * @returns An array of Api objects.
+   */
+  async getAllSubscriptions(profileId): Promise<Api[]> {
     const subIds = await (
       await this.subRepository.find({ where: { profileId } })
     ).map((sub) => this.apiRepository.find({ where: { id: sub.apiId } }));
-    return Promise.all(subIds);
+
+    return await (await Promise.all(subIds)).flatMap((api) => api);
   }
 }
