@@ -28,14 +28,17 @@ export class EndpointsService {
   ): Promise<Endpoint> {
     try {
       const endpoint = await this.endpointRepository.findOne({
-        where: { name: createEndpointDto.name },
+        where: {
+          method: createEndpointDto.method,
+          route: createEndpointDto.route
+        }
       });
 
       if (endpoint) {
         throw new BadRequestException(
           ZapiResponse.BadRequest(
             'Existing Endpoint',
-            'An endpoint with this name already exists, use another name',
+            'An endpoint with duplicate method already exists, use another method',
           ),
         );
       }
