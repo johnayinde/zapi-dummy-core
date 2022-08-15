@@ -29,7 +29,7 @@ export class EndpointsService {
     try {
       const endpoint = await this.endpointRepository.findOne({
         where: {
-          name: createEndpointDto.name,
+          apiId,
           method: createEndpointDto.method,
           route: createEndpointDto.route
         }
