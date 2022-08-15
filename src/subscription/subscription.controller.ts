@@ -49,8 +49,7 @@ export class SubscriptionController {
   async verify(
     @Headers('X-ZAPI-AUTH-TOKEN') xZapiAuth,
     @Body() subscriptionApiCall: SubscriptionApiCallDto,
-  ): Promise<Ok<Object>> {
-    // const verifySubscreqiption = await this.subscriptionService.verifySub(verifysub)
+  ): Promise<Ok<any>> {
     if (!xZapiAuth) {
       throw new BadRequestException(
         ZapiResponse.BadRequest('No Token', 'No Token provided', '403'),
