@@ -14,6 +14,7 @@ import { createSubscriptionDto } from './dto/create-subscription.dto';
 import { Tokens } from 'src/common/types';
 import { SubscriptionApiCallDto } from './dto/make-request.dto';
 import { Request } from 'express';
+import { IdCheck } from 'src/common/decorators/idcheck.decorator';
 
 @ApiTags('subscription')
 @Controller('subscription')
@@ -70,6 +71,7 @@ export class SubscriptionController {
   }
 
   @Get(':profileId/all')
+  @IdCheck('profileId')
   @ApiOperation({ summary: 'Get all apis a user is subscribed to' })
   async getAllSubscriptions(@Param('profileId') profileId: string) {
     const subscriptions = await this.subscriptionService.getAllSubscriptions(

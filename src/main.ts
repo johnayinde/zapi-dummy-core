@@ -6,7 +6,7 @@ import { IdCheckGuard } from './common/guards/idcheck.guard';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.useGlobalGuards(new IdCheckGuard())
+  // app.useGlobalGuards(new IdCheckGuard())
   app.enableCors();
   app.setGlobalPrefix('api');
 

@@ -54,9 +54,9 @@ export class CategoryService {
     }
   }
 
-  async deleteCategogry(id: string): Promise<string> {
+  async deleteCategogry(categoryId: string): Promise<string> {
     try {
-      const category = await this.categoryRepository.findOne({where : { id}});
+      const category = await this.categoryRepository.findOne({where : { id: categoryId}});
       if (category) {
          await this.categoryRepository.remove(category);
          return  `${category.name} category successfully deleted`
@@ -75,9 +75,9 @@ export class CategoryService {
     }
   }
 
-  async findOneById(id: string): Promise<Category> {
+  async findOneById(categoryId: string): Promise<Category> {
     try {
-      const category = await this.categoryRepository.findOne({ where: { id } });
+      const category = await this.categoryRepository.findOne({ where: { id: categoryId } });
       if (!category) {
         throw new NotFoundException(
           ZapiResponse.NotFoundRequest(

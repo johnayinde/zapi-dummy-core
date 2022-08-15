@@ -64,21 +64,21 @@ export class OrganisationService {
 
   /**
    * It add a new User to the organisation
-   * @Param id - the organisation id - profileId - the profile id of the person creating the organisation - orgUserDto -OrgUserDto
+   * @Param {string} organisationId - the organisation id - profileId - the profile id of the person creating the organisation - orgUserDto -OrgUserDto
    * @returns it returns a promise of the added user, throws an error if user is already added or if user profile does not exist it
    * */
-  async addUserToOrg(id: string, profileId: string, orgUserDto: OrgUserDto) {
+  async addUserToOrg(organisationId: string, profileId: string, orgUserDto: OrgUserDto) {
     /*Get organisation by Id, return an error if id does not exist*/
-    const organisation = await this.findOrganisationById(id);
+    const organisation = await this.findOrganisationById(organisationId);
 
     // ensure that only admin can add users to org, else throws an error
     if (orgUserDto.role === OrgRole.DEVELOPER) {
-      await this.checkForAdminRole(id, profileId);
+      await this.checkForAdminRole(organisationId, profileId);
     }
     /*Get profile by email, return an error if email does not exist*/
     const profile = await this.findUserProfileByEmail(orgUserDto.email);
     const existingUser = await this.profileOrgRepo.findOne({
-      where: { profileId: profile.id, organisationId: id },
+      where: { profileId: profile.id, id: organisationId },
     });
     if (existingUser != undefined) {
       throw new BadRequestException(
@@ -91,7 +91,7 @@ export class OrganisationService {
     }
     const newUser = this.profileOrgRepo.create({
       organisation: organisation,
-      organisationId: id,
+      organisationId: organisationId,
       profile: profile,
       profileId: profile.id,
       role: orgUserDto.role,
@@ -100,12 +100,12 @@ export class OrganisationService {
   }
 
   /**
-   * It find organisation by Id
-   * @Param {string} id - the organisation id
+   * It find organisation by organisationId
+   * @Param {string} organisationId - the organisation id
    * @returns a promise of the organisation, throws an error if id does not exist
    * */
-  async findOrganisationById(id: string): Promise<Organisation> {
-    const org = await this.orgRepo.findOne({ where: { id } });
+  async findOrganisationById(organisationId: string): Promise<Organisation> {
+    const org = await this.orgRepo.findOne({ where: { id: organisationId } });
     if (!org) {
       throw new NotFoundException(
         ZapiResponse.NotFoundRequest(
@@ -163,12 +163,12 @@ export class OrganisationService {
    * @Param - profileId: string  -id: string
    * @returns a promise of profileOrg[], throws an error if id does not exist
    * */
-  async findUsersByOrgId(id: string): Promise<ProfileOrg[]> {
+  async findUsersByOrgId(organisationId: string): Promise<ProfileOrg[]> {
     // check if org exist, else throws an error
-    const org = await this.findOrganisationById(id);
+    const org = await this.findOrganisationById(organisationId);
     if (org) {
       const users = await this.profileOrgRepo.find({
-        where: { organisationId: id },
+        where: { id: organisationId },
       });
       if (users.length === 0) {
         throw new NotFoundException(
@@ -199,16 +199,16 @@ export class OrganisationService {
 
   /**
    * It find an existing organisation by Id and remove it
-   * @Param id - the organisation id - profileId - the profile id of Admin
+   * @Param organisationId - the organisation id - profileId - the profile id of Admin
    * @returns a promise of the deleted organisation and organisation teammates, returns an error if id does not exist
    * */
-  async removeOrganisation(id: string, profileId: string) {
+  async removeOrganisation(organisationId: string, profileId: string) {
     /*Check if organisation id and Profile Id exist otherwise throws an error */
-    const org = await this.verifyIdsAndReturnOrg(id, profileId);
+    const org = await this.verifyIdsAndReturnOrg(organisationId, profileId);
     if (org) {
       /* checking if Admin is deleting organisation*/
       await this.checkForAdminRole(
-        id,
+        organisationId,
         profileId,
         'Only Admin can delete organisation',
       );
@@ -221,13 +221,13 @@ export class OrganisationService {
 
   /**
    * It find organisation users by Id and delete all users,
-   * @Param {string} id - the organisation id
+   * @Param {string} organisationId - the organisation id
    * @returns a promise of the deleted users, throws an error if id not not exist
    * */
-  async removeOrgUsers(id: string) {
+  async removeOrgUsers(organisationId: string) {
     try {
       // find users by organisation id, throws an error if id does not exist
-      const users = await this.findUsersByOrgId(id);
+      const users = await this.findUsersByOrgId(organisationId);
       return await this.profileOrgRepo.remove(users);
     } catch (error) {
       throw new BadRequestException(
@@ -238,24 +238,24 @@ export class OrganisationService {
 
   /**
    * Remove an organisation user
-   * @Param {string} id - the organisation id - profileId - the profile id of Admin - userEmail - user email
+   * @Param {string} organisationId - the organisation id - profileId - the profile id of Admin - userEmail - user email
    * @returns a promise of the deleted user
    * */
-  async removeUser(id: string, profileId: string, orgUser: DeleteUserDto) {
+  async removeUser(organisationId: string, profileId: string, orgUser: DeleteUserDto) {
     /*Check if organisation id and Profile Id exist */
-    const org = await this.verifyIdsAndReturnOrg(id, profileId);
+    const org = await this.verifyIdsAndReturnOrg(organisationId, profileId);
 
     if (org) {
       /* checking if Admin is removing a user*/
       await this.checkForAdminRole(
-        id,
+        organisationId,
         profileId,
         'Only Admin can delete organisation',
       );
 
       /**Verify email of user */
       const userProfile = await this.findUserProfileByEmail(orgUser.email);
-      const user = await this.checkIfOrgUserExist(id, userProfile.id);
+      const user = await this.checkIfOrgUserExist(organisationId, userProfile.id);
 
       // admin deleting himself && admin is the only admin
       if (userProfile.id === profileId && user.role === OrgRole.ADMIN) {
@@ -275,24 +275,24 @@ export class OrganisationService {
 
   /**
    * It find an existing organisation by Id and update it
-   * @Param - id - the organisation id - profileId - the profile id of Admin - updateOrgDto - UpdateOrganisationDto
+   * @Param - organisationId - the organisation id - profileId - the profile id of Admin - updateOrgDto - UpdateOrganisationDto
    * @returns a promise of the updated organisation, throws an error  if id does not exist
    * */
   async updateOrganisation(
-    id: string,
+    organisationId: string,
     profileId: string,
     updateOrgDto: UpdateOrganisationDto,
   ) {
     /*Check if organisation id and Profile Id exist */
-    const org = await this.verifyIdsAndReturnOrg(id, profileId);
+    const org = await this.verifyIdsAndReturnOrg(organisationId, profileId);
     if (org) {
       /* checking if Admin is updating*/
       await this.checkForAdminRole(
-        id,
+        organisationId,
         profileId,
         'Only Admin can update organisation',
       );
-      const updatedOrg = await this.orgRepo.update(id, updateOrgDto);
+      const updatedOrg = await this.orgRepo.update(organisationId, updateOrgDto);
       if (updatedOrg) {
         return updatedOrg;
       } else {
@@ -307,16 +307,16 @@ export class OrganisationService {
 
   /**
    * check if user is an organisation exist
-   * @Param id - the organisation id -profileId - the profile id of Admin
+   * @Param organisationId - the organisation id -profileId - the profile id of Admin
    * @returns a promise of ProfileOrg | throws an error if any id does not exist
    * */
   async checkIfOrgUserExist(
-    id: string,
+    organisationId: string,
     profileId: string,
   ): Promise<ProfileOrg> {
     /**find a user in organisation, throw an error if any id does not exist */
     const user = await this.profileOrgRepo.findOne({
-      where: { profileId: profileId, organisationId: id },
+      where: { profileId: profileId, id: organisationId },
     });
     if (!user) {
       throw new NotFoundException(
@@ -328,16 +328,16 @@ export class OrganisationService {
 
   /**
    * check if profile is an admin role in the organisation
-   * @Param id - the organisation id -profileId - the profile id of Admin - error_string - error string
+   * @Param organisationId - the organisation id -profileId - the profile id of Admin - error_string - error string
    * @returns void | throws an error if profile is not admin
    * */
   async checkForAdminRole(
-    id: string,
+    organisationId: string,
     profileId: string,
     error_string = 'Only admin can add user to this organisation',
   ) {
     /* if role is an Admin, then continue, otherwise, throw an error*/
-    const user = await this.checkIfOrgUserExist(id, profileId);
+    const user = await this.checkIfOrgUserExist(organisationId, profileId);
     if (user.role !== OrgRole.ADMIN) {
       throw new BadRequestException(
         ZapiResponse.BadRequest('Unauthorized', error_string, '401'),
@@ -348,18 +348,18 @@ export class OrganisationService {
 
   /**
    * check if the profile exist and if organisation exist
-   * @Param {string} id - the organisation id - profileId - the profile id of Admin
+   * @Param {string} organisationId - the organisation id - profileId - the profile id of Admin
    * @returns a promise of the organisation, throws an error if profile or organisation does not exist
    * */
   async verifyIdsAndReturnOrg(
-    id: string,
+    organisationId: string,
     profileId: string,
   ): Promise<Organisation> {
     /*Get profile by id, throws an error if id does not exist */
     const profile = await this.findProfileById(profileId);
     if (profile) {
       /*Get org by Id, throws an error if id does not exist*/
-      return await this.findOrganisationById(id);
+      return await this.findOrganisationById(organisationId);
     }
   }
 

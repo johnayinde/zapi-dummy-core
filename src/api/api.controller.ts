@@ -17,6 +17,7 @@ import { Api } from '../entities/api.entity';
 import { CustomFindDto } from './dto/customFind.dto';
 import { UpdateApiDto } from './dto/update-api.dto';
 import { Paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
+import { IdCheck } from 'src/common/decorators/idcheck.decorator';
 
 @ApiTags('Apis')
 @Controller('api')
@@ -25,6 +26,7 @@ export class ApiController {
 
   /* This is a post request that takes in a body and returns a promise of an Api */
   @Post('new/:profileId')
+  @IdCheck('profileId')
   @ApiOperation({ summary: 'Add a new api' })
   async create(
     @Param('profileId') profileId: string,
@@ -42,10 +44,11 @@ export class ApiController {
   }
 
   /* This is a get request that takes in an id and returns the api that matches the Id */
-  @Get(':id')
+  @Get(':apiId')
+  @IdCheck('apiId')
   @ApiOperation({ summary: 'Get a single api by api id' })
-  async findOne(@Param('id') id: string) {
-    const api = await this.apiService.findOneById(id);
+  async findOne(@Param('apiId') apiId: string) {
+    const api = await this.apiService.findOneById(apiId);
     return ZapiResponse.Ok(api, 'Ok', '200');
   }
   /* This is a post request that takes in a body and returns a promise of an Api. */
@@ -59,6 +62,7 @@ export class ApiController {
   /* A put request that takes in an apiId, profileId, and a body and returns a promise of an
   UpdateResult. */
   @Patch(':apiId')
+  @IdCheck('apiId')
   @ApiOperation({ summary: 'Update api' })
   async update(
     @Param('apiId') apiId: string,
@@ -70,10 +74,11 @@ export class ApiController {
   }
 
   /* This is a delete request that takes in an id and profileId and returns a promise of an Api. */
-  @Delete(':id')
+  @Delete(':apiId')
+  @IdCheck('apiId')
   @ApiOperation({ summary: 'Delete an API' })
-  async remove(@Param('id') id: string, @Query('profileId') profileId: string) {
-    const api = await this.apiService.remove(id, profileId);
+  async remove(@Param('apiId') apiId: string, @Query('profileId') profileId: string) {
+    const api = await this.apiService.remove(apiId, profileId);
     return ZapiResponse.Ok(api, 'Ok', '200');
   }
 }
