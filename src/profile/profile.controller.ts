@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post} from '@nestjs/common';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { ProfileService } from './profile.service';
 import { Profile } from '../entities/profile.entity';
+import { IdCheck } from 'src/common/decorators/idcheck.decorator';
 
 
 @Controller('profile')
@@ -17,9 +18,10 @@ export class ProfileController {
         return userProfile
     }
 
-    @Get('/:id')
-    async getProfile(@Param('id', new ParseUUIDPipe()) id: string){
-        const userProfile = await this.profileService.getOne(id)
+    @Get('/:profileId')
+    @IdCheck('profileId')
+    async getProfile(@Param('profileId', new ParseUUIDPipe()) profileId: string){
+        const userProfile = await this.profileService.getOne(profileId)
         return userProfile
     }
 }

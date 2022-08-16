@@ -6,6 +6,8 @@ import {
   Param,
   Post,
   Put,
+  SetMetadata,
+  UseGuards
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { OrganisationDto } from './dto/create-org.dto';
@@ -14,6 +16,8 @@ import { OrgUserDto } from './dto/create-user.dto';
 import { ZapiResponse } from 'src/common/helpers/response';
 import { UpdateOrganisationDto } from './dto/update-org.dto';
 import { DeleteUserDto } from './dto/delete-user.dto';
+import { IdCheckGuard } from 'src/common/guards/idcheck.guard';
+import { IdCheck } from 'src/common/decorators/idcheck.decorator';
 
 @ApiTags('Organisation')
 @Controller('organisation')
@@ -22,6 +26,7 @@ export class OrganisationController {
 
   @ApiOperation({ summary: 'Create an organisations' })
   @Post('/:profileId/create')
+  @IdCheck('profileId')
   async createNewOrganisation(
     @Body() organisationDto: OrganisationDto,
     @Param('profileId') profileId: string,
@@ -33,14 +38,15 @@ export class OrganisationController {
     return ZapiResponse.Ok(organisation, 'Created a new organisation', '201');
   }
 
-  @Post('/:profileId/addUser/:id')
+  @Post('/:profileId/addUser/:organisationId')
+  @IdCheck('profileId', 'organisationId')
   @ApiOperation({ summary: 'Add user to existing organisation' })
   async addUserToOrg(
     @Body() orgUserDto: OrgUserDto,
-    @Param('id') id: string,
+    @Param('organisationId') organisationId: string,
     @Param('profileId') profileId: string,
   ) {
-    const user = await this.orgService.addUserToOrg(id, profileId, orgUserDto);
+    const user = await this.orgService.addUserToOrg(organisationId, profileId, orgUserDto);
     return ZapiResponse.Ok(user, 'User added to organisation', '201');
   }
 
@@ -51,27 +57,30 @@ export class OrganisationController {
     return ZapiResponse.Ok(allOrgs, 'All organisation', '201');
   }
 
-  @Get('/:id')
+  @Get('/:organisationId')
+  @IdCheck('organisationId')
   @ApiOperation({ summary: 'Get one organisations' })
-  async getOrganisationById(@Param('id') id: string) {
-    const allOrganisation = await this.orgService.findOrganisationById(id);
+  async getOrganisationById(@Param('organisationId') organisationId: string) {
+    const allOrganisation = await this.orgService.findOrganisationById(organisationId);
     return ZapiResponse.Ok(allOrganisation, 'Get one organisation', '200');
   }
 
-  @Get('/users/:id')
+  @Get('/users/:organisationId')
+  @IdCheck('organisationId')
   @ApiOperation({ summary: 'Get users of organisation' })
-  async getOrgUsers(@Param('id') id: string) {
-    const users = await this.orgService.findUsersByOrgId(id);
+  async getOrgUsers(@Param('organisationId') organisationId: string) {
+    const users = await this.orgService.findUsersByOrgId(organisationId);
     return ZapiResponse.Ok(users, 'All users of an organisation', '200');
   }
 
-  @Delete('/:profileId/delete/:id')
+  @Delete('/:profileId/delete/:organisationId')
+  @IdCheck('profileId', 'organisationId')
   @ApiOperation({ summary: 'Delete an existing organisation and its users' })
   async removeOrganisation(
-    @Param('id') id: string,
+    @Param('organisationId') organisationId: string,
     @Param('profileId') profileId: string,
   ) {
-    const deletedOrg = await this.orgService.removeOrganisation(id, profileId);
+    const deletedOrg = await this.orgService.removeOrganisation(organisationId, profileId);
     return ZapiResponse.Ok(
       deletedOrg,
       'Organisation and teammates deleted',
@@ -79,15 +88,16 @@ export class OrganisationController {
     );
   }
 
-  @Delete('/:profileId/deleteUser/:id/')
+  @Delete('/:profileId/deleteUser/:organisationId/')
+  @IdCheck('profileId', 'organisationId')
   @ApiOperation({ summary: 'Delete a user from organisation' })
   async removeUser(
-    @Param('id') id: string,
+    @Param('organisationId') organisationId: string,
     @Param('profileId') profileId: string,
     @Body() userEmail: DeleteUserDto,
   ) {
     const deletedUser = await this.orgService.removeUser(
-      id,
+      organisationId,
       profileId,
       userEmail,
     );
@@ -98,25 +108,27 @@ export class OrganisationController {
     );
   }
 
-  @Put('/:profileId/update/:id')
+  @Put('/:profileId/update/:organisationId')
+  @IdCheck('profileId', 'organisationId')
   @ApiOperation({ summary: 'Update an existing organisation' })
   async updateOrganisation(
     @Body() updateOrganisationDto: UpdateOrganisationDto,
-    @Param('id') id: string,
+    @Param('organisationId') organisationId: string,
     @Param('profileId') profileId: string,
   ) {
     const updatedOrganisation = await this.orgService.updateOrganisation(
-      id,
+      organisationId,
       profileId,
       updateOrganisationDto,
     );
     return ZapiResponse.Ok(updatedOrganisation, 'Organisation updated', '200');
   }
 
-  @Get('/users-org/:id')
+  @Get('/users-org/:organisationId')
+  @IdCheck('organisationId')
   @ApiOperation({ summary: 'Get all Organisation a user belongs to' })
-  async getUserOrganisations(@Param('id') id: string) {
-    const users = await this.orgService.findUserOrgs(id);
+  async getUserOrganisations(@Param('organisationId') organisationId: string) {
+    const users = await this.orgService.findUserOrgs(organisationId);
     return ZapiResponse.Ok(users, 'User Organisation', '200');
   }
 }

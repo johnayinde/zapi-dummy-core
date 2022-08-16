@@ -33,8 +33,8 @@ export class ProfileService {
         }
     }
 
-    async getOne(profileID: string): Promise<Profile>{
-        const profile = await this.profileRepo.findOne({where : { id: profileID}})
+    async getOne(profileId: string): Promise<Profile>{
+        const profile = await this.profileRepo.findOne({where : { id: profileId}})
         if(!profile){
             throw new NotFoundException(
                 ZapiResponse.NotFoundRequest('Not Found', 'Profile does not exist', '404')

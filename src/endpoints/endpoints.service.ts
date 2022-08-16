@@ -73,13 +73,13 @@ export class EndpointsService {
   }
 
   /**
-   * Find one endpoint by id
-   * @param {string} id - string - the id of the endpoint you want to find
-   * @returns The endpoint with the id that was passed in.
+   * Find one endpoint by endpointId
+   * @param {string} endpointId - string - the endpointId of the endpoint you want to find
+   * @returns The endpoint with the endpointId that was passed in.
    */
-  async findOneById(id: string): Promise<Endpoint> {
+  async findOneById(endpointId: string): Promise<Endpoint> {
     try {
-      return await this.endpointRepository.findOne({ where: { id } });
+      return await this.endpointRepository.findOne({ where: { id: endpointId } });
     } catch (error) {
       throw new BadRequestException(
         ZapiResponse.BadRequest('Internal Server error', error.message, '500'),
@@ -99,23 +99,23 @@ export class EndpointsService {
 
   /**
    * It checks if the endpoint exists, if true, it updates the api.
-   * @param {string} id - The id of the endpoint to be updated.
+   * @param {string} endpointId - The endpointId of the endpoint to be updated.
    * @param {UpdateEndpointDto} updateEndpointDto - UpdateEndpointDto
    * @returns The update method returns a promise if updated Endpoint.
    */
 
   async update(
-    id: string,
+    endpointId: string,
     updateEndpointDto: UpdateEndpointDto,
   ): Promise<Endpoint> {
     try {
       const endpoint = await this.endpointRepository.findOne({
-        where: { id },
+        where: { id: endpointId },
       });
       if (endpoint) {
-        await this.endpointRepository.update(id, updateEndpointDto);
+        await this.endpointRepository.update(endpointId, updateEndpointDto);
         const updatedEndpoint = await this.endpointRepository.findOne({
-          where: { id },
+          where: { id: endpointId },
         });
         if (updatedEndpoint) {
           return updatedEndpoint;
@@ -137,14 +137,14 @@ export class EndpointsService {
   }
 
   /**
-   * It finds an endpoint by id, if it exists, it removes it, if it doesn't exist, it throws a
+   * It finds an endpoint by endpointId, if it exists, it removes it, if it doesn't exist, it throws a
    * NotFoundException
-   * @param {string} id - The id of the endpoint to be deleted
+   * @param {string} endpointId - The endpointId of the endpoint to be deleted
    * @returns The endpoint object that was removed.
    */
-  async remove(id: string): Promise<Endpoint> {
+  async remove(endpointId: string): Promise<Endpoint> {
     try {
-      const endpoint = await this.endpointRepository.findOne({ where: { id } });
+      const endpoint = await this.endpointRepository.findOne({ where: { id: endpointId } });
       if (endpoint) {
         return await this.endpointRepository.remove(endpoint);
       } else {

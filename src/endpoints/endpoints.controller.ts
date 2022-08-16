@@ -5,7 +5,7 @@ import {
   Param,
   Get,
   Patch,
-  Delete,
+  Delete
 } from '@nestjs/common';
 import { EndpointsService } from './endpoints.service';
 import { CreateEndpointDto } from './dto/create-endpoint.dto';
@@ -13,6 +13,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Endpoint } from '../entities/endpoint.entity';
 import { Ok, ZapiResponse } from 'src/common/helpers/response';
 import { UpdateEndpointDto } from './dto/update-endpoint.dto';
+import { IdCheck } from 'src/common/decorators/idcheck.decorator';
 
 @ApiTags('Endpoints')
 @Controller('endpoints')
@@ -21,6 +22,7 @@ export class EndpointsController {
 
   /* This is a post request that takes in a body and returns a promise of an Api */
   @Post('new/:apiId')
+  @IdCheck('apiId')
   @ApiOperation({ summary: 'Add a new endpoint' })
   async create(
     @Param('apiId') apiId: string,
@@ -42,15 +44,17 @@ export class EndpointsController {
   }
 
   /* This is a get request that takes in a parameter and returns a promise of an endpoint. */
-  @Get(':id')
-  @ApiOperation({ summary: 'Get an endpoint by Id' })
-  async findOneById(@Param('id') id: string): Promise<Ok<Endpoint>> {
-    const endpoint = await this.endpointsService.findOneById(id);
+  @Get(':endpointId')
+  @IdCheck('endpointId')
+  @ApiOperation({ summary: 'Get an endpoint by endpointId' })
+  async findOneById(@Param('endpointId') endpointId: string): Promise<Ok<Endpoint>> {
+    const endpoint = await this.endpointsService.findOneById(endpointId);
     return ZapiResponse.Ok(endpoint, 'Ok', '200');
   }
 
   /* This is a get request that takes in a parameter and returns a promise of an endpoint. */
   @Get('/single-api/:apiId')
+  @IdCheck('apiId')
   @ApiOperation({ summary: 'Get all endpoints for an api' })
   async findAllByApiId(@Param('apiId') apiId: string): Promise<Ok<Endpoint[]>> {
     const endpoint = await this.endpointsService.getAllApiEndpoints(apiId);
@@ -58,21 +62,21 @@ export class EndpointsController {
   }
 
   /* This is an update request that takes in an id and update Payload and returns a promise of updated endpoint. */
-  @Patch(':id')
+  @Patch(':endpointId')
   @ApiOperation({ summary: 'Update an endpoint' })
   async update(
     @Body() updateEndpointDto: UpdateEndpointDto,
-    @Param('id') id: string,
+    @Param('endpointId') endpointId: string,
   ): Promise<Ok<Endpoint>> {
-    const endpoint = await this.endpointsService.update(id, updateEndpointDto);
+    const endpoint = await this.endpointsService.update(endpointId, updateEndpointDto);
     return ZapiResponse.Ok(endpoint, 'Ok', '200');
   }
 
   /* This is a delete request that takes in an id and returns a promise of the deleted endpoint. */
-  @Delete(':id')
+  @Delete(':endpointId')
   @ApiOperation({ summary: 'Delete an endpoint' })
-  async remove(@Param('id') id: string) {
-    const endpoint = await this.endpointsService.remove(id);
+  async remove(@Param('endpointId') endpointId: string) {
+    const endpoint = await this.endpointsService.remove(endpointId);
     return ZapiResponse.Ok(endpoint, 'Ok', '200');
   }
 }

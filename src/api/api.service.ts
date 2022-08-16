@@ -103,12 +103,12 @@ export class ApiService {
 
   /**
    * It finds an api by id and throws an error if it doesn't exist
-   * @param {string} id - The id of the api to be found
+   * @param {string} apiId - The id of the api to be found
    * @returns An Api object
    */
-  async findOneById(id: string): Promise<Api> {
+  async findOneById(apiId: string): Promise<Api> {
     try {
-      const api = await this.apiRepository.findOne({ where: { id } });
+      const api = await this.apiRepository.findOne({ where: { id: apiId } });
       if (!api) {
         throw new NotFoundException(
           ZapiResponse.NotFoundRequest(
@@ -169,19 +169,19 @@ export class ApiService {
   /**
    * It finds an api by id, if it exists, it removes it, if it doesn't exist, it throws a
    * NotFoundException
-   * @param {string} id - The id of the api to be deleted
+   * @param {string} apiId - The id of the api to be deleted
    * @returns The api object that was removed.
    */
-  async remove(id: string, profileId: string): Promise<Api> {
+  async remove(apiId: string, profileId: string): Promise<Api> {
     try {
       /* Checking if the user is the owner of the api. */
-      const verified = await this.verify(id, profileId);
+      const verified = await this.verify(apiId, profileId);
       if (verified === false) {
         throw new NotFoundException(
           ZapiResponse.BadRequest('Forbidden', 'Unauthorized action', '403'),
         );
       }
-      const api = await this.apiRepository.findOne({ where: { id } });
+      const api = await this.apiRepository.findOne({ where: { id: apiId } });
       if (api) {
         return await this.apiRepository.remove(api);
       }
