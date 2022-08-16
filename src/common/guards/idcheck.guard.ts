@@ -16,10 +16,8 @@ import { Profile } from 'src/entities/profile.entity';
 import { Subscription } from 'src/entities/subscription.entity';
 import { Repository } from 'typeorm';
 import { ZapiResponse } from '../helpers/response';
+const validate = require ('uuid-validate');
 
-// const service = {
-//   'id': ProfileService
-// }
 
 @Injectable()
 export class IdCheckGuard implements CanActivate {
@@ -37,7 +35,7 @@ export class IdCheckGuard implements CanActivate {
     @InjectRepository(Pricing)
     private pricingRepo: Repository<Pricing>,
     @InjectRepository(Subscription)
-    private readonly subRepo: Repository<Subscription>,
+    private subRepo: Repository<Subscription>,
     private reflector: Reflector
   ){}
 
@@ -54,16 +52,16 @@ export class IdCheckGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext) {
     const requiredId = this.reflector.get<string[]>('id', context.getHandler());
-    console.log(requiredId);
     const request = context.switchToHttp().getRequest();
     for(let index in requiredId){
       const idValue = request.params[`${requiredId[index]}`];
         if(!idValue){
           throw new BadRequestException( ZapiResponse.BadRequest( 'bad request', `${requiredId[index]} is not provided as params`, '400'));
         }
-      console.log(idValue);
+        if(!validate(idValue)){
+          throw new BadRequestException( ZapiResponse.BadRequest( 'bad request', `${requiredId[index]} is not provided as type uuid`, '400'));
+        }
       const objDetail = await this.repo[`${requiredId[index]}`].findOne({where: {id: idValue}});
-      console.log(objDetail);
         if(!objDetail){
           throw new NotFoundException( ZapiResponse.NotFoundRequest( 'Not Found', `${requiredId[index]} does not exist`, '404'));
         }
